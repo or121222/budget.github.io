@@ -6,7 +6,8 @@
     <title>מנהל תקציב</title>
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4e54c8"> <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#4e54c8">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon-192.png">
     
@@ -14,9 +15,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* כאן נכנס כל ה-CSS המקורי שלך מההודעה הקודמת... */
-        /* שום דבר לא השתנה בעיצוב, רק וודא שהעתקת את ה-CSS מהתשובה הקודמת */
-        
         :root {
             --bg-color: #f0f2f5;
             --card-bg: #ffffff;
@@ -32,28 +30,23 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Rubik', sans-serif; background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 50px; user-select: none; -webkit-tap-highlight-color: transparent; }
-        
-        /* ... שאר ה-CSS שלך ... */
-        /* כדי לחסוך מקום בתשובה, תעתיק לכאן את כל ה-STYLE מהתשובה הקודמת */
-        /* הוספתי רק user-select: none כדי שירגיש כמו אפליקציה ולא יסמן טקסט */
 
         header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            padding: 40px 20px 80px 20px; /* קצת יותר רווח למעלה בגלל הסטטוס בר */
+            padding: 40px 20px 80px 20px;
             text-align: center;
             border-bottom-left-radius: 30px;
             border-bottom-right-radius: 30px;
             position: relative;
             z-index: 1;
         }
-        /* העתק את שאר העיצוב מהקוד הקודם */
-        
-        /* העתק את ה-CSS המקורי במלואו לכאן */
+
         header h1 { margin-bottom: 5px; font-weight: 500; font-size: 1.5rem; opacity: 0.9; }
         .total-display-container { margin-top: 10px; }
         .total-label { font-size: 0.9rem; opacity: 0.8; }
         .total-balance { font-size: 3rem; font-weight: 700; direction: ltr; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+
         .top-inputs-container { max-width: 800px; margin: -50px auto 30px auto; padding: 0 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; position: relative; z-index: 2; }
         .input-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center; border: 1px solid rgba(255,255,255,0.5); transition: transform 0.2s; }
         .input-card:hover { transform: translateY(-3px); }
@@ -61,9 +54,11 @@
         .input-card i { margin-left: 5px; color: var(--primary); }
         .big-input { width: 100%; border: none; background: #f1f2f6; border-radius: 8px; padding: 10px; font-size: 1.3rem; font-weight: bold; color: var(--text-dark); text-align: center; outline: none; transition: 0.3s; }
         .big-input:focus { background: #fff; box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.2); }
+
         .controls { max-width: 800px; margin: 0 auto 20px auto; padding: 0 15px; display: flex; justify-content: flex-end; }
         .btn-add-cat { background: var(--text-dark); color: white; border: none; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; display: flex; align-items: center; gap: 8px; }
         .btn-add-cat:hover { background: var(--primary); transform: scale(1.05); }
+
         #categories-container { max-width: 800px; margin: 0 auto; padding: 0 15px; display: flex; flex-direction: column; gap: 20px; }
         .category-card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; border: 1px solid rgba(0,0,0,0.02); animation: fadeIn 0.4s ease-out; }
         .card-header { background: #f8f9fa; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
@@ -71,6 +66,7 @@
         .card-total { font-weight: 700; direction: ltr; }
         .card-total.pos { color: var(--income); }
         .card-total.neg { color: var(--expense); }
+
         .items-list { list-style: none; }
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #f9f9f9; }
         .item-row:last-child { border-bottom: none; }
@@ -78,24 +74,28 @@
         .item-amount { font-weight: 600; direction: ltr; }
         .amount-pos { color: var(--income); }
         .amount-neg { color: var(--expense); }
+
         .btn-delete-item { color: #dfe6e9; cursor: pointer; border: none; background: none; transition: color 0.2s; }
         .btn-delete-item:hover { color: var(--expense); }
         .btn-delete-cat { background:none; border:none; color:#ccc; cursor:pointer; margin-right:10px; }
         .btn-delete-cat:hover { color: var(--expense); }
+
         .quick-add { padding: 15px; background: #fff; border-top: 1px solid #eee; display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; align-items: center; }
         .input-clean { border: 1px solid #eee; background: #fbfbfb; padding: 10px; border-radius: 8px; outline: none; }
         .input-clean:focus { border-color: var(--secondary); background: #fff; }
         .btn-small-add { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; }
+
         .type-toggle { display: flex; border: 1px solid #eee; border-radius: 8px; overflow: hidden; cursor: pointer; }
         .type-option { flex: 1; text-align: center; padding: 9px 0; font-size: 1rem; color:#ccc; }
         .type-option.active.exp { background: var(--expense); color: white; }
         .type-option.active.inc { background: var(--income); color: white; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 600px) { .quick-add { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; } .input-clean:first-child { grid-column: 1 / -1; } .btn-small-add { width: 100%; grid-column: 2; } .type-toggle { grid-column: 1; } .top-inputs-container { gap: 10px; } .total-balance { font-size: 2.2rem; } }
-
     </style>
 </head>
 <body>
+
     <header>
         <h1><i class="fas fa-wallet"></i> ניהול תקציב</h1>
         <div class="total-display-container">
@@ -124,50 +124,74 @@
     <div id="categories-container"></div>
     
     <script>
-        // Service Worker Registration for PWA
+        // Register PWA Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
-            .then(() => console.log('Service Worker Registered'));
+            .then(() => console.log('Service Worker Registered'))
+            .catch((error) => console.log('Service Worker Registration Failed:', error));
         }
 
-        // --- כאן נכנס כל הסקריפט (Logic) מההודעה הקודמת ---
-        // העתק את כל הקוד שהיה בתוך <script> בתשובה הקודמת
-        // ...
-        
-        // (שים לב: העתק את כל הפונקציות והלוגיקה מההודעה הקודמת לכאן)
-        
         let categories = JSON.parse(localStorage.getItem('budgetCategories')) || [
             { id: 1, name: 'מזון וסופר', items: [] },
             { id: 2, name: 'בית וחשבונות', items: [] },
             { id: 3, name: 'בילויים ופנאי', items: [] }
         ];
+
         const bankInput = document.getElementById('bank-input');
         const salaryInput = document.getElementById('salary-input');
         const savedBank = localStorage.getItem('budgetBank') || '';
         const savedSalary = localStorage.getItem('budgetSalary') || '';
+        
         bankInput.value = savedBank;
         salaryInput.value = savedSalary;
+
         const container = document.getElementById('categories-container');
         const globalBalanceEl = document.getElementById('global-balance');
 
-        function saveSettings() { localStorage.setItem('budgetBank', bankInput.value); localStorage.setItem('budgetSalary', salaryInput.value); updateGlobalTotal(); }
-        function saveCategories() { localStorage.setItem('budgetCategories', JSON.stringify(categories)); renderCategories(); updateGlobalTotal(); }
+        function saveSettings() {
+            localStorage.setItem('budgetBank', bankInput.value);
+            localStorage.setItem('budgetSalary', salaryInput.value);
+            updateGlobalTotal();
+        }
+
+        function saveCategories() {
+            localStorage.setItem('budgetCategories', JSON.stringify(categories));
+            renderCategories();
+            updateGlobalTotal();
+        }
+
         function updateGlobalTotal() {
             const bank = parseFloat(bankInput.value) || 0;
             const salary = parseFloat(salaryInput.value) || 0;
+            
             let categoriesSum = 0;
-            categories.forEach(cat => { categoriesSum += cat.items.reduce((acc, item) => acc + item.amount, 0); });
+            categories.forEach(cat => {
+                categoriesSum += cat.items.reduce((acc, item) => acc + item.amount, 0);
+            });
+
             const total = bank + salary + categoriesSum;
             globalBalanceEl.innerText = formatMoney(total);
-            if(total < 0) globalBalanceEl.style.color = '#ff7675'; else globalBalanceEl.style.color = '#ffffff';
+            
+            if(total < 0) globalBalanceEl.style.color = '#ff7675';
+            else globalBalanceEl.style.color = '#ffffff';
         }
-        function formatMoney(amount) { return amount.toLocaleString('he-IL', { style: 'currency', currency: 'ILS' }); }
+
+        function formatMoney(amount) {
+            return amount.toLocaleString('he-IL', { style: 'currency', currency: 'ILS' });
+        }
+
         function renderCategories() {
             container.innerHTML = '';
-            if (categories.length === 0) { container.innerHTML = `<div style="text-align:center; padding:20px; color:#888;">אין קטגוריות</div>`; return; }
+            
+            if (categories.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:20px; color:#888;">אין קטגוריות</div>`;
+                return;
+            }
+
             categories.forEach(cat => {
                 const catTotal = cat.items.reduce((acc, item) => acc + item.amount, 0);
                 const totalClass = catTotal >= 0 ? 'pos' : 'neg';
+
                 const card = document.createElement('div');
                 card.className = 'category-card';
                 card.innerHTML = `
@@ -204,22 +228,59 @@
                 container.appendChild(card);
             });
         }
-        function toggleType(el, type) { const parent = el.parentElement; parent.children[0].classList.remove('active'); parent.children[1].classList.remove('active'); el.classList.add('active'); parent.dataset.selected = type; }
+
+        function toggleType(el, type) {
+            const parent = el.parentElement;
+            parent.children[0].classList.remove('active');
+            parent.children[1].classList.remove('active');
+            el.classList.add('active');
+            parent.dataset.selected = type;
+        }
+
         function addItem(catId) {
             const desc = document.getElementById(`desc-${catId}`).value;
             const amountVal = document.getElementById(`amount-${catId}`).value;
             const type = document.getElementById(`type-${catId}`).dataset.selected;
+
             if(!desc || !amountVal) return;
+
             let finalAmount = parseFloat(amountVal);
-            if(type === 'exp') finalAmount = -Math.abs(finalAmount); else finalAmount = Math.abs(finalAmount);
+            if(type === 'exp') finalAmount = -Math.abs(finalAmount);
+            else finalAmount = Math.abs(finalAmount);
+
             const category = categories.find(c => c.id === catId);
-            category.items.push({ id: '_' + Math.random().toString(36).substr(2, 9), text: desc, amount: finalAmount });
+            category.items.push({
+                id: '_' + Math.random().toString(36).substr(2, 9),
+                text: desc,
+                amount: finalAmount
+            });
+
             saveCategories();
         }
-        function deleteItem(catId, itemId) { const category = categories.find(c => c.id === catId); category.items = category.items.filter(i => i.id !== itemId); saveCategories(); }
-        function addNewCategoryPrompt() { const name = prompt("שם קטגוריה חדשה:"); if (name) { categories.push({ id: Date.now(), name: name, items: [] }); saveCategories(); } }
-        function deleteCategory(id) { if(confirm("למחוק קטגוריה זו?")) { categories = categories.filter(c => c.id !== id); saveCategories(); } }
-        renderCategories(); updateGlobalTotal();
+
+        function deleteItem(catId, itemId) {
+            const category = categories.find(c => c.id === catId);
+            category.items = category.items.filter(i => i.id !== itemId);
+            saveCategories();
+        }
+
+        function addNewCategoryPrompt() {
+            const name = prompt("שם קטגוריה חדשה:");
+            if (name) {
+                categories.push({ id: Date.now(), name: name, items: [] });
+                saveCategories();
+            }
+        }
+
+        function deleteCategory(id) {
+            if(confirm("למחוק קטגוריה זו?")) {
+                categories = categories.filter(c => c.id !== id);
+                saveCategories();
+            }
+        }
+
+        renderCategories();
+        updateGlobalTotal();
     </script>
 </body>
 </html>

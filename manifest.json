@@ -1,5 +1,5 @@
 {
-    "name": "מנהל התקציב",
+    "name": "Budget Police",
     "short_name": "התקציב שלי",
     "start_url": "./index.html",
     "display": "standalone",
@@ -14,4 +14,5 @@
         }
     ]
 }
+
 

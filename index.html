@@ -432,4 +432,274 @@
             
             // Widget Hook
             const finalBalanceText = document.getElementById('global-balance').innerText;
-            if (typeof Android !== 'undefined' && Android.updateBalance
+            if (typeof Android !== 'undefined' && Android.updateBalanceWidget) {
+                Android.updateBalanceWidget(finalBalanceText);
+            }
+        }
+
+        function renderApp() {
+            // טען משכורת לחודש נוכחי
+            const salaryInput = document.getElementById('salary-input');
+            const key = getMonthKey(currentDate);
+            salaryInput.value = (appData.monthlySalaries && appData.monthlySalaries[key]) ? appData.monthlySalaries[key] : '';
+
+            const container = document.getElementById('categories-container');
+            container.innerHTML = '';
+            let totalExpenses = 0;
+
+            appData.categories.forEach(cat => {
+                let filteredItems = cat.items.filter(item => {
+                    const d = new Date(item.date);
+                    return d.getMonth() === currentDate.getMonth() && d.getFullYear() === currentDate.getFullYear();
+                });
+
+                const catTotal = filteredItems.reduce((sum, item) => sum + item.amount, 0);
+                totalExpenses += catTotal;
+
+                const spentPos = Math.abs(Math.min(0, catTotal));
+                const limit = cat.limit || 1000;
+                const percent = Math.min(100, (spentPos / limit) * 100);
+                let colorClass = percent > 100 ? 'bg-red' : (percent > 75 ? 'bg-yellow' : 'bg-green');
+                let balanceStyle = percent >= 100 ? 'color:var(--danger)' : '';
+
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="cat-info">
+                            <div class="cat-emoji">${cat.emoji}</div>
+                            <div>
+                                <div style="font-weight:bold">${cat.name}</div>
+                                <div class="cat-limit" onclick="openLimitModal(${cat.id})">תקציב: ${limit} <i class="fas fa-pen" style="font-size:0.7rem"></i></div>
+                            </div>
+                        </div>
+                        <div class="current-spend" style="${balanceStyle}">${formatMoney(catTotal)}</div>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill ${colorClass}" style="width:${percent}%"></div></div>
+                    <ul class="items-list">
+                        ${filteredItems.map(item => `
+                            <li class="item-row">
+                                <span>${item.text} ${item.isAuto ? '<i class="fas fa-robot" title="קבוע" style="font-size:0.7rem"></i>' : ''}</span>
+                                <div>
+                                    <span class="${item.amount < 0 ? 'amount-neg' : 'amount-pos'}">${formatMoney(Math.abs(item.amount))}</span>
+                                    <i class="fas fa-times" onclick="deleteItem(${cat.id}, '${item.id}')" style="margin-right:5px; color:#ccc;"></i>
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                    <div class="quick-add">
+                        <div class="qa-row">
+                            <input id="d-${cat.id}" class="qa-input" placeholder="תיאור">
+                        </div>
+                        <div class="qa-row">
+                            <input id="a-${cat.id}" type="number" class="qa-input" placeholder="סכום">
+                        </div>
+                        <button class="qa-btn" onclick="addItem(${cat.id})"><i class="fas fa-plus"></i> הוסף</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            const bank = parseFloat(appData.bank) || 0;
+            const salary = parseFloat(appData.monthlySalaries?.[key]) || 0;
+            const total = bank + salary + totalExpenses;
+            
+            const balEl = document.getElementById('global-balance');
+            balEl.innerText = formatMoney(total);
+            balEl.style.color = total < 0 ? 'var(--danger)' : 'white';
+
+            renderHistoryChart();
+        }
+
+        // --- Chart ---
+        function renderHistoryChart() {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            let labels = [], data = [];
+            for(let i=5; i>=0; i--) {
+                let d = new Date(); d.setMonth(d.getMonth() - i);
+                labels.push(d.toLocaleDateString('he-IL', {month:'short'}));
+                let mTotal = 0;
+                appData.categories.forEach(cat => {
+                    cat.items.forEach(item => {
+                        let iDate = new Date(item.date);
+                        if(iDate.getMonth() === d.getMonth() && iDate.getFullYear() === d.getFullYear()) {
+                            if(item.amount < 0) mTotal += Math.abs(item.amount);
+                        }
+                    });
+                });
+                data.push(mTotal);
+            }
+            if(chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'הוצאות', data, backgroundColor: '#4e54c8', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display:false} }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        // --- Recurring (Fixed) ---
+        function renderRecurringPage() {
+            const container = document.getElementById('recurring-list-container');
+            container.innerHTML = '';
+            
+            const select = document.getElementById('rec-cat-select');
+            if(select) {
+                select.innerHTML = appData.categories.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
+            }
+
+            if (!appData.recurringSettings) appData.recurringSettings = [];
+
+            if (appData.recurringSettings.length === 0) {
+                 container.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.6">אין הוראות קבע</div>';
+                 return;
+            }
+
+            appData.recurringSettings.forEach((rec, index) => {
+                const catName = appData.categories.find(c => c.id == rec.catId)?.name || '?';
+                const el = document.createElement('div');
+                el.className = 'recur-item';
+                el.innerHTML = `<div><div style="font-weight:bold">${rec.text}</div><div style="font-size:0.8rem; color:#666">${catName} • ${formatMoney(rec.amount)}</div></div><button style="border:none; background:none; color:var(--danger)" onclick="deleteRecurring(${index})"><i class="fas fa-trash"></i></button>`;
+                container.appendChild(el);
+            });
+        }
+        
+        function addRecurringSetting() {
+            const text = document.getElementById('rec-desc').value;
+            const amount = parseFloat(document.getElementById('rec-amount').value);
+            const catId = document.getElementById('rec-cat-select').value;
+            if(!text || !amount) return;
+            
+            // שמירה בהגדרות
+            appData.recurringSettings.push({ text, amount, catId });
+            
+            // הוספה מיידית לחודש הנוכחי
+            const cat = appData.categories.find(c => c.id == catId);
+            if(cat) {
+                cat.items.push({
+                    id: Date.now().toString(),
+                    text: text + ' (קבוע)',
+                    amount: -Math.abs(amount),
+                    date: currentDate.toISOString(),
+                    isAuto: true
+                });
+            }
+
+            saveAndRender(); 
+            document.getElementById('rec-desc').value = '';
+            document.getElementById('rec-amount').value = '';
+            renderRecurringPage();
+            alert('הוצאה קבועה נוספה! (היא גם נוספה לחודש הנוכחי)');
+        }
+        
+        function deleteRecurring(index) {
+            appData.recurringSettings.splice(index, 1);
+            localStorage.setItem('budgetUltimateDataV7', JSON.stringify(appData));
+            renderRecurringPage();
+        }
+
+        function checkAndRunRecurring() {
+            const now = new Date();
+            const currentMonthKey = `${now.getMonth()}-${now.getFullYear()}`;
+            if(appData.lastProcessedMonth !== currentMonthKey) {
+                if (appData.recurringSettings) {
+                    appData.recurringSettings.forEach(rec => {
+                        const cat = appData.categories.find(c => c.id == rec.catId);
+                        if(cat) cat.items.push({ id: 'auto_'+Date.now()+Math.random(), text: rec.text, amount: -Math.abs(rec.amount), date: now.toISOString(), isAuto: true });
+                    });
+                }
+                appData.lastProcessedMonth = currentMonthKey;
+                localStorage.setItem('budgetUltimateDataV7', JSON.stringify(appData));
+            }
+        }
+
+        // --- Salary Calculator (Updated) ---
+        function renderShiftCalculator() {
+            const container = document.getElementById('shifts-list');
+            container.innerHTML = '';
+            shiftDefinitions.forEach((shift, index) => {
+                const el = document.createElement('div');
+                el.className = 'shift-row';
+                el.innerHTML = `
+                    <span class="shift-name">${shift.name}</span>
+                    <input type="number" id="shift-cnt-${index}" class="shift-input" placeholder="0">
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function calculateSalary() {
+            const rate = parseFloat(document.getElementById('calc-rate').value) || 0;
+            const bonus = parseFloat(document.getElementById('calc-bonus').value) || 0;
+            const tax = parseFloat(document.getElementById('calc-tax').value) || 0;
+            
+            let totalPay = 0;
+
+            shiftDefinitions.forEach((shift, index) => {
+                const count = parseFloat(document.getElementById(`shift-cnt-${index}`).value) || 0;
+                if(count > 0) {
+                    let payForOneShift = 0;
+                    shift.breakdown.forEach(part => {
+                        // pay = hours * (percent/100) * rate
+                        payForOneShift += part.h * (part.p / 100) * rate;
+                    });
+                    totalPay += payForOneShift * count;
+                }
+            });
+
+            const finalNet = totalPay + bonus - tax;
+            document.getElementById('calc-total-display').innerText = formatMoney(finalNet);
+        }
+
+        // --- Standard Actions ---
+        function addItem(catId) {
+            const desc = document.getElementById(`d-${catId}`).value;
+            const amount = document.getElementById(`a-${catId}`).value;
+            if(!desc || !amount) return;
+            const cat = appData.categories.find(c => c.id === catId);
+            cat.items.push({ id: Date.now().toString(), text: desc, amount: -Math.abs(parseFloat(amount)), date: currentDate.toISOString() });
+            saveAndRender();
+        }
+        function deleteItem(catId, itemId) {
+            const cat = appData.categories.find(c => c.id === catId);
+            cat.items = cat.items.filter(i => i.id !== itemId);
+            saveAndRender();
+        }
+
+        // --- Utils & Modals ---
+        function changeMonth(delta) { currentDate.setMonth(currentDate.getMonth() + delta); updateMonthDisplay(); renderApp(); }
+        function updateMonthDisplay() { document.getElementById('current-month-display').innerText = currentDate.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' }); }
+        
+        function openCategoryModal() { document.getElementById('cat-modal').classList.add('open'); }
+        function closeCategoryModal() { document.getElementById('cat-modal').classList.remove('open'); }
+        function selectEmoji(e) { document.getElementById('new-cat-emoji').value = e; }
+        function confirmAddCategory() {
+            const name = document.getElementById('new-cat-name').value;
+            const limit = document.getElementById('new-cat-limit').value;
+            const emoji = document.getElementById('new-cat-emoji').value || '📁';
+            if(name) {
+                appData.categories.push({ id: Date.now(), name, emoji, limit: parseFloat(limit)||1000, items: [] });
+                saveAndRender(); closeCategoryModal();
+            }
+        }
+        function openLimitModal(catId) {
+            const cat = appData.categories.find(c => c.id === catId);
+            document.getElementById('edit-cat-id').value = catId;
+            document.getElementById('limit-modal-cat-name').innerText = "עבור: " + cat.name;
+            document.getElementById('edit-cat-limit').value = cat.limit;
+            document.getElementById('limit-modal').classList.add('open');
+        }
+        function confirmEditLimit() {
+            const catId = parseInt(document.getElementById('edit-cat-id').value);
+            const newLimit = parseFloat(document.getElementById('edit-cat-limit').value);
+            const cat = appData.categories.find(c => c.id === catId);
+            if(cat && newLimit) { cat.limit = newLimit; saveAndRender(); document.getElementById('limit-modal').classList.remove('open'); }
+        }
+
+        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); }
+        function formatMoney(n) { return n.toLocaleString('he-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 }); }
+        function checkPremiumStatus() { if(appData.isPremium) { document.querySelectorAll('.ad-spacer').forEach(e=>e.style.display='none'); document.body.style.paddingBottom="80px"; } }
+        function buyPremium() { if(confirm("האם לאשר רכישת פרימיום?")) { appData.isPremium = true; localStorage.setItem('budgetUltimateDataV7', JSON.stringify(appData)); checkPremiumStatus(); alert("תודה שנרשמת!"); } }
+        function exportToCSV() {}
+    </script>
+</body>
+</html>

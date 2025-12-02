@@ -222,14 +222,18 @@
                 <input type="number" id="bank-input" placeholder="0" oninput="saveAndRender()">
             </div>
             <div class="g-card">
-                <label>משכורת חודשית</label>
-                <div class="salary-toggle" onclick="toggleSalaryMode()">
-                    <input type="checkbox" id="salary-mode-cb"> משתנה?
-                </div>
-                <input type="number" id="salary-input" placeholder="0" oninput="updateSalary()">
-            </div>
+    <label>משכורת חודשית</label>
+    
+    <div style="display: flex; align-items: center; gap: 8px;">
+        
+        <input type="number" id="salary-input" placeholder="0" oninput="updateSalary()" style="flex: 1;">
+        
+        <div class="salary-toggle" onclick="toggleSalaryMode()" style="white-space: nowrap; font-size: 0.8rem; display: flex; align-items: center; gap: 3px;">
+            <input type="checkbox" id="salary-mode-cb"> משתנה?
         </div>
-
+        
+    </div>
+</div>
         <div id="categories-container"></div>
         
         <div class="chart-container-card">
@@ -633,4 +637,5 @@
     </script>
 </body>
 </html>
+
 

@@ -322,6 +322,25 @@
             localStorage.setItem('budgetUltimateData', JSON.stringify(appData));
             
             renderApp(); // Re-calculate immediately
+            // שמירת הנתונים ב-LocalStorage
+            localStorage.setItem('budgetUltimateData', JSON.stringify(appData));
+    
+            renderApp(); // חישוב היתרה מחדש
+    
+            // --- הקוד החדש לווידג'ט ---
+            // 1. חישוב היתרה הסופית לשליחה
+            const bank = parseFloat(appData.bank) || 0;
+            const salary = parseFloat(appData.salary) || 0;
+    
+            // נצטרך לחשב שוב את ההוצאות או לשלוף מהמסך
+            // הדרך הכי קלה היא לשלוף מהאלמנט שכבר חישבנו:
+            const finalBalanceText = document.getElementById('global-balance').innerText;
+
+            // 2. שליחה לאנדרואיד (רק אם אנחנו בתוך האפליקציה)
+            if (typeof Android !== 'undefined' && Android.updateBalanceWidget) {
+           Android.updateBalanceWidget(finalBalanceText);
+        }
+        // ---------------------------
         }
 
         function renderApp() {
@@ -571,6 +590,7 @@
     </script>
 </body>
 </html>
+
 
 
 

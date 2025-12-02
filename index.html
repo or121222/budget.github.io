@@ -3,286 +3,694 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Budgetln</title>
+    <title>Budget Master Pro</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4e54c8">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon-192.png">
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
+            /* Light Mode Variables */
             --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #2d3436;
+            --text-sec: #636e72;
             --primary: #4e54c8;
             --secondary: #8f94fb;
-            --text-dark: #2d3436;
-            --text-light: #636e72;
-            --income: #00b894;
-            --expense: #d63031;
-            --shadow: 0 4px 12px rgba(0,0,0,0.08);
-            --radius: 12px;
+            --accent: #00cec9;
+            --danger: #ff7675;
+            --warning: #fdcb6e;
+            --success: #00b894;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Rubik', sans-serif; background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 50px; user-select: none; -webkit-tap-highlight-color: transparent; }
+        /* Dark Mode Overrides */
+        body.dark-mode {
+            --bg-color: #1e272e;
+            --card-bg: rgba(45, 52, 54, 0.95);
+            --text-main: #dfe6e9;
+            --text-sec: #b2bec3;
+            --primary: #6c5ce7;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: background 0.3s, color 0.3s; }
+        
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 80px;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- Header & Controls --- */
         header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 40px 20px 80px 20px;
-            text-align: center;
+            padding: 20px 20px 70px 20px;
             border-bottom-left-radius: 30px;
             border-bottom-right-radius: 30px;
+            color: white;
+            text-align: center;
             position: relative;
-            z-index: 1;
         }
 
-        header h1 { margin-bottom: 5px; font-weight: 500; font-size: 1.5rem; opacity: 0.9; }
-        .total-display-container { margin-top: 10px; }
-        .total-label { font-size: 0.9rem; opacity: 0.8; }
-        .total-balance { font-size: 3rem; font-weight: 700; direction: ltr; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-        .top-inputs-container { max-width: 800px; margin: -50px auto 30px auto; padding: 0 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; position: relative; z-index: 2; }
-        .input-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center; border: 1px solid rgba(255,255,255,0.5); transition: transform 0.2s; }
-        .input-card:hover { transform: translateY(-3px); }
-        .input-card label { display: block; font-size: 0.9rem; color: var(--text-light); margin-bottom: 8px; font-weight: 500; }
-        .input-card i { margin-left: 5px; color: var(--primary); }
-        .big-input { width: 100%; border: none; background: #f1f2f6; border-radius: 8px; padding: 10px; font-size: 1.3rem; font-weight: bold; color: var(--text-dark); text-align: center; outline: none; transition: 0.3s; }
-        .big-input:focus { background: #fff; box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.2); }
+        .header-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
 
-        .controls { max-width: 800px; margin: 0 auto 20px auto; padding: 0 15px; display: flex; justify-content: flex-end; }
-        .btn-add-cat { background: var(--text-dark); color: white; border: none; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; display: flex; align-items: center; gap: 8px; }
-        .btn-add-cat:hover { background: var(--primary); transform: scale(1.05); }
+        .month-selector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
 
-        #categories-container { max-width: 800px; margin: 0 auto; padding: 0 15px; display: flex; flex-direction: column; gap: 20px; }
-        .category-card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; border: 1px solid rgba(0,0,0,0.02); animation: fadeIn 0.4s ease-out; }
-        .card-header { background: #f8f9fa; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
-        .card-title { font-weight: 700; color: var(--text-dark); }
-        .card-total { font-weight: 700; direction: ltr; }
-        .card-total.pos { color: var(--income); }
-        .card-total.neg { color: var(--expense); }
+        .month-arrow { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; padding: 10px; }
 
-        .items-list { list-style: none; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #f9f9f9; }
-        .item-row:last-child { border-bottom: none; }
-        .item-actions { display: flex; align-items: center; gap: 15px; }
-        .item-amount { font-weight: 600; direction: ltr; }
-        .amount-pos { color: var(--income); }
-        .amount-neg { color: var(--expense); }
+        .total-balance {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-top: 10px;
+            direction: ltr;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
 
-        .btn-delete-item { color: #dfe6e9; cursor: pointer; border: none; background: none; transition: color 0.2s; }
-        .btn-delete-item:hover { color: var(--expense); }
-        .btn-delete-cat { background:none; border:none; color:#ccc; cursor:pointer; margin-right:10px; }
-        .btn-delete-cat:hover { color: var(--expense); }
+        /* --- Search & Tools --- */
+        .tools-bar {
+            max-width: 800px;
+            margin: -40px auto 20px auto;
+            padding: 0 15px;
+            display: flex;
+            gap: 10px;
+            position: relative;
+            z-index: 5;
+        }
 
-        .quick-add { padding: 15px; background: #fff; border-top: 1px solid #eee; display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; align-items: center; }
-        .input-clean { border: 1px solid #eee; background: #fbfbfb; padding: 10px; border-radius: 8px; outline: none; }
-        .input-clean:focus { border-color: var(--secondary); background: #fff; }
-        .btn-small-add { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; }
+        .search-container {
+            flex: 1;
+            position: relative;
+        }
 
-        .type-toggle { display: flex; border: 1px solid #eee; border-radius: 8px; overflow: hidden; cursor: pointer; }
-        .type-option { flex: 1; text-align: center; padding: 9px 0; font-size: 1rem; color:#ccc; }
-        .type-option.active.exp { background: var(--expense); color: white; }
-        .type-option.active.inc { background: var(--income); color: white; }
+        .search-input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border-radius: 15px;
+            border: none;
+            background: var(--card-bg);
+            color: var(--text-main);
+            box-shadow: var(--shadow);
+            outline: none;
+        }
 
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-sec);
+        }
+
+        /* --- Global Settings (Bank/Salary) --- */
+        .global-inputs {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 0 15px;
+        }
+
+        .g-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: var(--glass-border);
+        }
+        
+        .g-card label { font-size: 0.85rem; color: var(--text-sec); display: block; margin-bottom: 5px; }
+        .g-card input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        /* --- Categories --- */
+        #categories-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .category-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            border: var(--glass-border);
+            overflow: hidden;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .card-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .cat-info { display: flex; align-items: center; gap: 10px; }
+        .cat-emoji { 
+            background: rgba(100,100,100,0.1); 
+            width: 40px; height: 40px; 
+            border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 1.4rem; 
+        }
+        
+        .cat-details h3 { font-size: 1.1rem; margin-bottom: 2px; }
+        .cat-limit { font-size: 0.8rem; color: var(--text-sec); cursor: pointer; text-decoration: underline; }
+
+        .cat-totals { text-align: left; }
+        .current-spend { font-size: 1.2rem; font-weight: bold; direction: ltr; display: block; }
+        
+        /* Progress Bar */
+        .progress-track {
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+            margin: 10px 15px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease, background 0.3s; }
+        .bg-green { background: var(--success); }
+        .bg-yellow { background: var(--warning); }
+        .bg-red { background: var(--danger); }
+
+        /* Items List */
+        .items-list { list-style: none; border-top: 1px solid rgba(0,0,0,0.05); }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            font-size: 0.95rem;
+        }
+        .item-date { font-size: 0.75rem; color: var(--text-sec); margin-right: 5px; }
+        .amount-pos { color: var(--success); font-weight: bold; }
+        .amount-neg { color: var(--danger); font-weight: bold; }
+
+        /* Add Item Area */
+        .quick-add {
+            padding: 15px;
+            background: rgba(0,0,0,0.02);
+            display: grid;
+            grid-template-columns: 2fr 1fr auto auto;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .qa-input {
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .qa-btn {
+            background: var(--text-main);
+            color: var(--bg-color);
+            border: none;
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .recur-toggle {
+            font-size: 1.2rem;
+            color: var(--text-sec);
+            cursor: pointer;
+            padding: 5px;
+        }
+        .recur-toggle.active { color: var(--primary); }
+
+        /* --- CHART SECTION --- */
+        .chart-container-card {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+        .chart-wrapper {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            border: var(--glass-border);
+            padding: 20px;
+            height: 300px;
+        }
+        .chart-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        /* --- Floating Action Button (New Cat) --- */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--primary);
+            color: white;
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(78, 84, 200, 0.4);
+            cursor: pointer;
+            border: none;
+            z-index: 100;
+        }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 600px) { .quick-add { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; } .input-clean:first-child { grid-column: 1 / -1; } .btn-small-add { width: 100%; grid-column: 2; } .type-toggle { grid-column: 1; } .top-inputs-container { gap: 10px; } .total-balance { font-size: 2.2rem; } }
+        
+        @media (max-width: 600px) {
+            .quick-add { grid-template-columns: 1fr 1fr auto; grid-template-rows: auto auto; }
+            .qa-input:first-child { grid-column: 1 / -1; }
+            .total-balance { font-size: 2.2rem; }
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1><i class="fas fa-wallet"></i> ניהול תקציב</h1>
-        <div class="total-display-container">
-            <span class="total-label">יתרה סופית לשימוש (כולל הכל)</span>
-            <div class="total-balance" id="global-balance">₪0.00</div>
+        <div class="header-top">
+            <button class="header-btn" onclick="toggleDarkMode()" title="מצב לילה"><i class="fas fa-moon"></i></button>
+            <div style="font-weight:500; opacity:0.8">Budget Master Pro</div>
+            <button class="header-btn" onclick="exportToCSV()" title="ייצוא לאקסל"><i class="fas fa-file-export"></i></button>
         </div>
+
+        <div class="month-selector">
+            <button class="month-arrow" onclick="changeMonth(-1)"><i class="fas fa-chevron-right"></i></button>
+            <span id="current-month-display">נובמבר 2023</span>
+            <button class="month-arrow" onclick="changeMonth(1)"><i class="fas fa-chevron-left"></i></button>
+        </div>
+
+        <div class="total-balance" id="global-balance">₪0.00</div>
     </header>
 
-    <div class="top-inputs-container">
-        <div class="input-card">
-            <label><i class="fas fa-university"></i> עו"ש בבנק</label>
-            <input type="number" id="bank-input" class="big-input" placeholder="0" oninput="saveSettings()">
-        </div>
-        <div class="input-card">
-            <label><i class="fas fa-money-bill-wave"></i> משכורת צפויה</label>
-            <input type="number" id="salary-input" class="big-input" placeholder="0" oninput="saveSettings()">
+    <div class="tools-bar">
+        <div class="search-container">
+            <input type="text" id="search-box" class="search-input" placeholder="חיפוש מהיר..." oninput="handleSearch()">
+            <i class="fas fa-search search-icon"></i>
         </div>
     </div>
 
-    <div class="controls">
-        <button class="btn-add-cat" onclick="addNewCategoryPrompt()">
-            <i class="fas fa-plus"></i> הוסף קטגוריה
-        </button>
+    <div class="global-inputs">
+        <div class="g-card">
+            <label>עו"ש בבנק</label>
+            <input type="number" id="bank-input" placeholder="0" onchange="saveData()">
+        </div>
+        <div class="g-card">
+            <label>משכורת חודשית</label>
+            <input type="number" id="salary-input" placeholder="0" onchange="saveData()">
+        </div>
     </div>
 
     <div id="categories-container"></div>
-    
+
+    <div class="chart-container-card">
+        <div class="chart-wrapper">
+            <div class="chart-title">מגמת הוצאות - חצי שנה אחרונה</div>
+            <canvas id="expenseChart"></canvas>
+        </div>
+    </div>
+
+    <button class="fab" onclick="promptNewCategory()">
+        <i class="fas fa-plus"></i>
+    </button>
+
     <script>
-        // Register PWA Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-            .then(() => console.log('Service Worker Registered'))
-            .catch((error) => console.log('Service Worker Registration Failed:', error));
-        }
+        // --- State Management ---
+        let currentDate = new Date(); 
+        let searchText = "";
+        let isDarkMode = localStorage.getItem('darkMode') === 'true';
+        let expenseChartInstance = null; // Chart instance
 
-        let categories = JSON.parse(localStorage.getItem('budgetCategories')) || [
-            { id: 1, name: 'מזון וסופר', items: [] },
-            { id: 2, name: 'בית וחשבונות', items: [] },
-            { id: 3, name: 'בילויים ופנאי', items: [] }
-        ];
+        // Data Structure
+        let appData = JSON.parse(localStorage.getItem('budgetProData')) || {
+            categories: [
+                { id: 1, name: 'מזון וסופר', emoji: '🍕', limit: 2000, items: [] },
+                { id: 2, name: 'רכב ודלק', emoji: '🚗', limit: 800, items: [] },
+                { id: 3, name: 'חשבונות', emoji: '🏠', limit: 1500, items: [] }
+            ],
+            bank: 0,
+            salary: 0
+        };
 
-        const bankInput = document.getElementById('bank-input');
-        const salaryInput = document.getElementById('salary-input');
-        const savedBank = localStorage.getItem('budgetBank') || '';
-        const savedSalary = localStorage.getItem('budgetSalary') || '';
-        
-        bankInput.value = savedBank;
-        salaryInput.value = savedSalary;
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if(isDarkMode) document.body.classList.add('dark-mode');
+            document.getElementById('bank-input').value = appData.bank || '';
+            document.getElementById('salary-input').value = appData.salary || '';
 
-        const container = document.getElementById('categories-container');
-        const globalBalanceEl = document.getElementById('global-balance');
+            updateMonthDisplay();
+            renderApp();
+        });
 
-        function saveSettings() {
-            localStorage.setItem('budgetBank', bankInput.value);
-            localStorage.setItem('budgetSalary', salaryInput.value);
-            updateGlobalTotal();
-        }
+        // --- Core Functions ---
 
-        function saveCategories() {
-            localStorage.setItem('budgetCategories', JSON.stringify(categories));
-            renderCategories();
-            updateGlobalTotal();
-        }
-
-        function updateGlobalTotal() {
-            const bank = parseFloat(bankInput.value) || 0;
-            const salary = parseFloat(salaryInput.value) || 0;
-            
-            let categoriesSum = 0;
-            categories.forEach(cat => {
-                categoriesSum += cat.items.reduce((acc, item) => acc + item.amount, 0);
-            });
-
-            const total = bank + salary + categoriesSum;
-            globalBalanceEl.innerText = formatMoney(total);
-            
-            if(total < 0) globalBalanceEl.style.color = '#ff7675';
-            else globalBalanceEl.style.color = '#ffffff';
-        }
-
-        function formatMoney(amount) {
-            return amount.toLocaleString('he-IL', { style: 'currency', currency: 'ILS' });
-        }
-
-        function renderCategories() {
+        function renderApp() {
+            const container = document.getElementById('categories-container');
             container.innerHTML = '';
-            
-            if (categories.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:20px; color:#888;">אין קטגוריות</div>`;
-                return;
-            }
 
-            categories.forEach(cat => {
-                const catTotal = cat.items.reduce((acc, item) => acc + item.amount, 0);
-                const totalClass = catTotal >= 0 ? 'pos' : 'neg';
+            let totalExpensesForCurrentMonth = 0;
+
+            appData.categories.forEach(cat => {
+                let filteredItems = cat.items.filter(item => {
+                    const itemDate = new Date(item.date);
+                    const isSameMonth = itemDate.getMonth() === currentDate.getMonth() && 
+                                      itemDate.getFullYear() === currentDate.getFullYear();
+                    const matchesSearch = item.text.includes(searchText);
+                    return isSameMonth && matchesSearch;
+                });
+
+                const catTotal = filteredItems.reduce((sum, item) => sum + item.amount, 0);
+                totalExpensesForCurrentMonth += catTotal;
+
+                const spentPositive = Math.abs(Math.min(0, catTotal)); 
+                const limit = cat.limit || 1000;
+                const percent = Math.min(100, (spentPositive / limit) * 100);
+                
+                let progressColor = 'bg-green';
+                let balanceColor = ''; 
+                
+                if(percent > 75) progressColor = 'bg-yellow';
+                if(percent >= 100) {
+                    progressColor = 'bg-red';
+                    balanceColor = 'color: var(--danger);'; 
+                }
 
                 const card = document.createElement('div');
                 card.className = 'category-card';
                 card.innerHTML = `
                     <div class="card-header">
-                        <div style="display:flex; align-items:center">
-                            <button class="btn-delete-cat" onclick="deleteCategory(${cat.id})"><i class="fas fa-trash"></i></button>
-                            <span class="card-title">${cat.name}</span>
+                        <div class="cat-info">
+                            <div class="cat-emoji">${cat.emoji}</div>
+                            <div class="cat-details">
+                                <h3>
+                                    ${cat.name} 
+                                    <i class="fas fa-trash" style="font-size:0.7rem; color:#ccc; cursor:pointer" onclick="deleteCategory(${cat.id})"></i>
+                                </h3>
+                                <span class="cat-limit" onclick="editLimit(${cat.id})">תקציב: ${formatMoney(limit)}</span>
+                            </div>
                         </div>
-                        <span class="card-total ${totalClass}">${formatMoney(catTotal)}</span>
+                        <div class="cat-totals">
+                            <span class="current-spend" style="${balanceColor}">${formatMoney(catTotal)}</span>
+                        </div>
+                    </div>
+                    <div class="progress-track" title="${percent.toFixed(0)}% נוצל">
+                        <div class="progress-fill ${progressColor}" style="width: ${percent}%"></div>
                     </div>
                     <ul class="items-list">
-                        ${cat.items.map(item => `
+                        ${filteredItems.map(item => `
                             <li class="item-row">
-                                <span class="item-name">${item.text}</span>
-                                <div class="item-actions">
-                                    <span class="item-amount ${item.amount < 0 ? 'amount-neg' : 'amount-pos'}">
+                                <div>
+                                    <span class="item-date">${formatDateShort(item.date)}</span>
+                                    ${item.isRecurring ? '<i class="fas fa-sync-alt" title="קבוע" style="font-size:0.7rem; color:var(--primary)"></i>' : ''}
+                                    ${item.text}
+                                </div>
+                                <div>
+                                    <span class="${item.amount < 0 ? 'amount-neg' : 'amount-pos'}">
                                         ${formatMoney(Math.abs(item.amount))} ${item.amount < 0 ? '-' : '+'}
                                     </span>
-                                    <button class="btn-delete-item" onclick="deleteItem(${cat.id}, '${item.id}')"><i class="fas fa-times"></i></button>
+                                    <i class="fas fa-times" style="margin-right:8px; color:#ddd; cursor:pointer" onclick="deleteItem(${cat.id}, '${item.id}')"></i>
                                 </div>
                             </li>
                         `).join('')}
                     </ul>
                     <div class="quick-add">
-                        <input type="text" class="input-clean" id="desc-${cat.id}" placeholder="תיאור">
-                        <input type="number" class="input-clean" id="amount-${cat.id}" placeholder="סכום">
-                        <div class="type-toggle" id="type-${cat.id}" data-selected="exp">
-                            <div class="type-option active exp" onclick="toggleType(this, 'exp')">-</div>
-                            <div class="type-option inc" onclick="toggleType(this, 'inc')">+</div>
-                        </div>
-                        <button class="btn-small-add" onclick="addItem(${cat.id})"><i class="fas fa-check"></i></button>
+                        <input type="text" class="qa-input" id="desc-${cat.id}" placeholder="תיאור...">
+                        <input type="number" class="qa-input" id="amount-${cat.id}" placeholder="סכום">
+                        <i class="fas fa-sync-alt recur-toggle" id="recur-${cat.id}" onclick="this.classList.toggle('active')" title="הוצאה קבועה חודשית"></i>
+                        <button class="qa-btn" onclick="addItem(${cat.id})"><i class="fas fa-plus"></i></button>
                     </div>
                 `;
                 container.appendChild(card);
             });
+
+            const bank = parseFloat(appData.bank) || 0;
+            const salary = parseFloat(appData.salary) || 0;
+            const finalBalance = bank + salary + totalExpensesForCurrentMonth;
+
+            const balEl = document.getElementById('global-balance');
+            balEl.innerText = formatMoney(finalBalance);
+            balEl.style.color = finalBalance < 0 ? 'var(--danger)' : 'white';
+
+            // עדכון הגרף בכל רינדור
+            renderHistoryChart();
         }
 
-        function toggleType(el, type) {
-            const parent = el.parentElement;
-            parent.children[0].classList.remove('active');
-            parent.children[1].classList.remove('active');
-            el.classList.add('active');
-            parent.dataset.selected = type;
-        }
+        // --- Logic: Add/Delete ---
 
         function addItem(catId) {
-            const desc = document.getElementById(`desc-${catId}`).value;
-            const amountVal = document.getElementById(`amount-${catId}`).value;
-            const type = document.getElementById(`type-${catId}`).dataset.selected;
+            const descInput = document.getElementById(`desc-${catId}`);
+            const amountInput = document.getElementById(`amount-${catId}`);
+            const recurToggle = document.getElementById(`recur-${catId}`);
+            const text = descInput.value.trim();
+            const amountVal = parseFloat(amountInput.value);
+            
+            if(!text || isNaN(amountVal)) return;
 
-            if(!desc || !amountVal) return;
+            const finalAmount = -Math.abs(amountVal); 
 
-            let finalAmount = parseFloat(amountVal);
-            if(type === 'exp') finalAmount = -Math.abs(finalAmount);
-            else finalAmount = Math.abs(finalAmount);
+            const newItem = {
+                id: Date.now().toString(),
+                text: text,
+                amount: finalAmount,
+                date: currentDate.toISOString(), 
+                isRecurring: recurToggle.classList.contains('active')
+            };
 
-            const category = categories.find(c => c.id === catId);
-            category.items.push({
-                id: '_' + Math.random().toString(36).substr(2, 9),
-                text: desc,
-                amount: finalAmount
-            });
+            const cat = appData.categories.find(c => c.id === catId);
+            cat.items.push(newItem);
+            
+            descInput.value = '';
+            amountInput.value = '';
+            recurToggle.classList.remove('active');
 
-            saveCategories();
+            saveData();
+            renderApp();
         }
 
         function deleteItem(catId, itemId) {
-            const category = categories.find(c => c.id === catId);
-            category.items = category.items.filter(i => i.id !== itemId);
-            saveCategories();
+            const cat = appData.categories.find(c => c.id === catId);
+            cat.items = cat.items.filter(i => i.id !== itemId);
+            saveData();
+            renderApp();
         }
 
-        function addNewCategoryPrompt() {
+        function promptNewCategory() {
             const name = prompt("שם קטגוריה חדשה:");
-            if (name) {
-                categories.push({ id: Date.now(), name: name, items: [] });
-                saveCategories();
+            if(!name) return;
+            const emojis = ['🍕','🚗','🏠','👕','💊','✈️','🎁','📱','🐶','💡'];
+            let emoji = prompt(`בחר אימוג'י (העתק הדבק או הקלד):\n${emojis.join(' ')}`, '📁');
+            if(!emoji) emoji = '📁';
+            const limit = prompt("תקרה חודשית (תקציב) לקטגוריה זו:", "1000");
+
+            appData.categories.push({
+                id: Date.now(),
+                name: name,
+                emoji: emoji,
+                limit: parseFloat(limit) || 1000,
+                items: []
+            });
+            saveData();
+            renderApp();
+        }
+
+        function editLimit(catId) {
+            const cat = appData.categories.find(c => c.id === catId);
+            const newLimit = prompt(`עדכן תקציב ל-${cat.name}:`, cat.limit);
+            if(newLimit) {
+                cat.limit = parseFloat(newLimit);
+                saveData();
+                renderApp();
             }
         }
 
-        function deleteCategory(id) {
-            if(confirm("למחוק קטגוריה זו?")) {
-                categories = categories.filter(c => c.id !== id);
-                saveCategories();
+        function deleteCategory(catId) {
+            if(confirm("למחוק את כל הקטגוריה וההיסטוריה שלה?")) {
+                appData.categories = appData.categories.filter(c => c.id !== catId);
+                saveData();
+                renderApp();
             }
         }
 
-        renderCategories();
-        updateGlobalTotal();
+        // --- Logic: Month & Navigation ---
+
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            updateMonthDisplay();
+            renderApp();
+        }
+
+        function updateMonthDisplay() {
+            const options = { year: 'numeric', month: 'long' };
+            document.getElementById('current-month-display').innerText = 
+                currentDate.toLocaleDateString('he-IL', options);
+        }
+
+        // --- Logic: Chart ---
+        function renderHistoryChart() {
+            // הכנת נתונים ל-6 חודשים אחרונים
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            
+            // יצירת מערך של 6 החודשים האחרונים
+            let labels = [];
+            let dataPoints = [];
+            let bgColors = [];
+
+            for (let i = 5; i >= 0; i--) {
+                let d = new Date();
+                d.setMonth(d.getMonth() - i);
+                let monthKey = `${d.getMonth()}-${d.getFullYear()}`;
+                
+                // תווית יפה לגרף
+                labels.push(d.toLocaleDateString('he-IL', { month: 'short' }));
+                
+                // בדיקה אם זה החודש הנוכחי (לצביעה שונה)
+                let isCurrent = (d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear());
+                bgColors.push(isCurrent ? '#4e54c8' : '#b2bec3');
+
+                // סיכום הוצאות לחודש זה
+                let monthTotal = 0;
+                appData.categories.forEach(cat => {
+                    cat.items.forEach(item => {
+                        let itemDate = new Date(item.date);
+                        if(itemDate.getMonth() === d.getMonth() && itemDate.getFullYear() === d.getFullYear()) {
+                            if (item.amount < 0) monthTotal += Math.abs(item.amount);
+                        }
+                    });
+                });
+                dataPoints.push(monthTotal);
+            }
+
+            if(expenseChartInstance) {
+                expenseChartInstance.destroy();
+            }
+
+            expenseChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'הוצאות (₪)',
+                        data: dataPoints,
+                        backgroundColor: bgColors,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Logic: Utils ---
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        function handleSearch() {
+            searchText = document.getElementById('search-box').value;
+            renderApp();
+        }
+
+        function exportToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
+            csvContent += "תאריך,קטגוריה,תיאור,סכום\n";
+            appData.categories.forEach(cat => {
+                cat.items.forEach(item => {
+                    const dateStr = new Date(item.date).toLocaleDateString('he-IL');
+                    csvContent += `${dateStr},${cat.name},${item.text},${item.amount}\n`;
+                });
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "budget_data.csv");
+            document.body.appendChild(link);
+            link.click();
+        }
+
+        function saveData() {
+            appData.bank = document.getElementById('bank-input').value;
+            appData.salary = document.getElementById('salary-input').value;
+            localStorage.setItem('budgetProData', JSON.stringify(appData));
+        }
+
+        function formatMoney(amount) {
+            return amount.toLocaleString('he-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 });
+        }
+
+        function formatDateShort(dateStr) {
+            const d = new Date(dateStr);
+            return `${d.getDate()}/${d.getMonth()+1}`;
+        }
     </script>
 </body>
 </html>
-
-

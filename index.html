@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Budget Master Ultimate v7</title>
+    <title>Budget Master Ultimate v8</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4e54c8">
@@ -11,11 +11,14 @@
     <link rel="apple-touch-icon" href="icon-192.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+        /* === MAIN APP STYLES === */
         :root {
+            /* App Variables */
             --bg-color: #f0f2f5;
             --card-bg: rgba(255, 255, 255, 0.98);
             --text-main: #2d3436;
@@ -28,6 +31,12 @@
             --glass-border: 1px solid rgba(255, 255, 255, 0.6);
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             --nav-height: 70px;
+
+            /* Calculator Variables (Integrated) */
+            --calc-bg1:#d7e1ec; --calc-bg2:#f8f9fb; --calc-card:#fff; 
+            --calc-muted:#6b7280; --calc-line:#e5e7eb;
+            --calc-green:#10b981; --calc-blue:#3b82f6; --calc-amber:#f59e0b; 
+            --calc-red:#ef4444; --calc-ink:#111827;
         }
 
         body.dark-mode {
@@ -45,16 +54,16 @@
             font-family: 'Rubik', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            padding-bottom: 160px;
+            padding-bottom: 100px; /* Space for Nav */
             user-select: none;
         }
 
         /* --- Page Layouts --- */
-        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page { display: none; animation: fadeIn 0.3s ease; padding-bottom: 80px; }
         .page.active { display: block; }
 
         /* --- Header --- */
-        header {
+        header.app-header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             padding: 20px 20px 60px 20px;
             border-bottom-left-radius: 30px;
@@ -135,32 +144,6 @@
         .recur-item { background: var(--card-bg); padding: 15px; margin: 10px 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); }
         .recur-add-box { background: var(--card-bg); padding: 20px; margin: 15px; border-radius: 15px; box-shadow: var(--shadow); }
 
-        /* --- Salary Calc Page (Updated) --- */
-        .calc-box {
-            background: var(--card-bg);
-            margin: 15px; padding: 15px;
-            border-radius: 15px;
-            box-shadow: var(--shadow);
-            border: var(--glass-border);
-        }
-        .shift-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .shift-row:last-child { border-bottom: none; }
-        .shift-name { font-size: 0.9rem; font-weight: 500; flex: 1; }
-        .shift-input { width: 60px; text-align: center; padding: 8px; border-radius: 8px; border: 1px solid #ddd; font-weight: bold; }
-        
-        .calc-result { 
-            background: var(--primary); color: white; 
-            padding: 20px; border-radius: 15px; margin: 20px; 
-            text-align: center; font-size: 1.5rem; font-weight: bold; 
-            box-shadow: 0 4px 15px rgba(78,84,200,0.3);
-        }
-
         /* --- General UI --- */
         .btn-primary { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; }
         .ad-spacer { height: 60px; width: 100%; }
@@ -169,7 +152,7 @@
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-height);
             background: var(--card-bg); display: flex; justify-content: space-around; align-items: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 100; backdrop-filter: blur(10px);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; backdrop-filter: blur(10px);
             border-top: var(--glass-border);
         }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sec); font-size: 0.7rem; cursor: pointer; padding: 8px; flex: 1; }
@@ -191,13 +174,52 @@
         .emoji-grid { display: flex; gap: 5px; justify-content: center; margin-bottom: 10px; }
         .emoji-opt { font-size: 1.5rem; cursor: pointer; padding: 5px; border-radius: 5px; }
 
+        /* ========================================= */
+        /* === CALCULATOR SPECIFIC STYLES (Merged) === */
+        /* ========================================= */
+        .calc-wrapper {
+            font-family: "Segoe UI", system-ui, Arial, sans-serif;
+            color: var(--calc-ink);
+            padding: 10px;
+        }
+        .calc-panel { margin-top:16px; background:var(--calc-card); border:1px solid var(--calc-line); border-radius:16px; padding:16px; box-shadow:0 8px 30px rgba(0,0,0,.06); }
+        .calc-row { display:flex; flex-wrap:wrap; gap:12px; align-items:end; margin-bottom: 10px; }
+        .calc-row label small { display:block; color:var(--calc-muted); font-size:12px; }
+        .calc-inp, .calc-sel { appearance:none; border:1px solid var(--calc-line); background:#fff; padding:10px 12px; border-radius:12px; min-width:130px; font-size:14px; outline:none; width: 100%; }
+        
+        .calc-btn { border:1px solid transparent; padding:9px 14px; border-radius:12px; font-weight:600; cursor:pointer; transition:.2s; font-size:14px; }
+        .calc-btn.acc { background:var(--calc-green); color:#fff; }
+        .calc-btn.info { background:var(--calc-blue); color:#fff; }
+        .calc-btn.warn { background:var(--calc-amber); color:#fff; }
+        .calc-btn.ghost { background:transparent; border-color:var(--calc-line); }
+        
+        .calc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; }
+        .calc-card { background:#fff; border:1px solid var(--calc-line); border-radius:16px; padding:14px; box-shadow:0 6px 22px rgba(0,0,0,.05); display:flex; flex-direction:column; gap:10px; }
+        .calc-card h3 { margin:0; font-size:16px; }
+        .calc-meta { color:var(--calc-muted); font-size:12px; }
+        .calc-counter { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+        .calc-count { font-size:28px; font-weight:800; min-width:48px; text-align:center; }
+        .calc-iconbtn { border:1px solid var(--calc-line); background:linear-gradient(#fff,#f7f7f7); width:40px; height:40px; border-radius:999px; font-size:20px; cursor:pointer; }
+        .calc-iconbtn.plus { border-color:#86efac; background:linear-gradient(#ecfdf5,#d1fae5); }
+        .calc-iconbtn.minus { border-color:#fed7aa; background:linear-gradient(#fff7ed,#ffedd5); }
+        
+        .calc-summary { display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between; background:#fff; border:1px solid var(--calc-line); border-radius:16px; padding:18px; margin-top:16px; box-shadow:0 8px 30px rgba(0,0,0,.06); }
+        .calc-total { font-size:28px; font-weight:900; }
+        
+        .calc-table { width:100%; border-collapse:collapse; margin-top:10px; background:#fff; border:1px solid var(--calc-line); border-radius:16px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,.05); }
+        .calc-table th, .calc-table td { padding:10px; border-bottom:1px solid var(--calc-line); text-align:center; }
+        .calc-table thead th { background:#f8fafc; color:#334155; }
+        
+        .calc-two-col { display:grid; grid-template-columns:1fr; gap:16px; margin-top:18px; }
+        @media(min-width:900px){ .calc-two-col { grid-template-columns:2fr 1fr; } }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="page-dashboard" class="page active">
-        <header>
+        <header class="app-header">
             <div class="header-top">
                 <button class="header-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
                 <div style="font-weight:700">Budget Master</div>
@@ -240,7 +262,7 @@
     </div>
 
     <div id="page-recurring" class="page">
-        <header style="padding-bottom: 20px;"><h2>הוצאות קבועות</h2></header>
+        <header class="app-header" style="padding-bottom: 20px;"><h2>הוצאות קבועות</h2></header>
         <div id="recurring-list-container"></div>
         <div class="recur-add-box">
             <h3>הוספה חדשה</h3>
@@ -253,44 +275,105 @@
     </div>
 
     <div id="page-calc" class="page">
-        <header style="padding-bottom: 20px;"><h2>מחשבון שכר</h2></header>
+        <div class="calc-wrapper">
+            <h2 style="text-align:center; margin-bottom:10px; color:var(--primary)">חישוב משכורת משמר</h2>
+            
+            <section class="calc-panel">
+              <div class="calc-row">
+                <label style="flex:1">
+                  <small>שכר לשעה (₪)</small>
+                  <input id="hourly" type="number" min="0" step="0.01" placeholder="0" class="calc-inp">
+                </label>
+                <label style="flex:1">
+                  <small>חודש</small>
+                  <input id="month" type="month" class="calc-inp">
+                </label>
+              </div>
+              <div class="calc-row">
+                <label style="flex:1">
+                  <small>שעות/משמרת (ברירת מחדל)</small>
+                  <input id="defaultHours" type="number" min="0" step="0.25" value="8" class="calc-inp">
+                </label>
+                <label style="flex:1">
+                  <small>מטבע</small>
+                  <select id="currency" class="calc-sel">
+                    <option value="₪">₪ (ILS)</option>
+                    <option value="$">$ (USD)</option>
+                    <option value="€">€ (EUR)</option>
+                  </select>
+                </label>
+              </div>
+              <div class="calc-row">
+                  <button class="calc-btn ghost" id="resetMonth">איפוס חודש</button>
+                  <label class="calc-btn info" for="importFile" style="cursor:pointer; text-align:center; flex:1">ייבוא הגדרות</label>
+                  <input id="importFile" type="file" accept=".csv,.json" style="display:none">
+                  <button class="calc-btn ghost" id="downloadTpl">תבנית</button>
+              </div>
+            </section>
         
-        <div class="calc-box">
-            <label style="font-weight:bold; margin-bottom:10px; display:block">הגדרות בסיס</label>
-            <div class="shift-row">
-                <span>תעריף שעתי (₪)</span>
-                <input type="number" id="calc-rate" class="shift-input" placeholder="32" style="width:80px">
-            </div>
-            <div class="shift-row">
-                <span>נסיעות / בונוסים</span>
-                <input type="number" id="calc-bonus" class="shift-input" placeholder="0" style="width:80px">
-            </div>
-            <div class="shift-row">
-                <span>הורדות (מיסים וכו')</span>
-                <input type="number" id="calc-tax" class="shift-input" placeholder="0" style="width:80px; color:red">
-            </div>
-        </div>
-
-        <div class="calc-box">
-            <label style="font-weight:bold; margin-bottom:10px; display:block">כמות משמרות לפי סוג</label>
-            <div id="shifts-list">
+            <section class="calc-panel" style="margin-top:16px">
+              <div class="calc-grid" id="grid"></div>
+            </section>
+        
+            <section class="calc-two-col">
+              <div class="calc-summary">
+                <div>
+                  <div style="color:var(--calc-muted);font-size:12px">סה״כ משמרות</div>
+                  <div class="calc-total" id="totalShifts">0</div>
                 </div>
-        </div>
-
-        <div style="padding: 0 20px;">
-            <button class="btn-primary" onclick="calculateSalary()">חשב שכר</button>
-        </div>
-
-        <div class="calc-result">
-            <div style="font-size:0.9rem; opacity:0.8; margin-bottom:5px">שכר משוער (נטו)</div>
-            <span id="calc-total-display">₪0.00</span>
-        </div>
+                <div>
+                  <div style="color:var(--calc-muted);font-size:12px;text-align:end">שעות</div>
+                  <div class="calc-total" id="totalHours" style="text-align:end">0</div>
+                </div>
+                <div style="text-align:end">
+                  <div style="color:var(--calc-muted);font-size:12px">שכר משוער</div>
+                  <div class="calc-total" id="grandTotal">₪0</div>
+                </div>
+              </div>
         
+              <div class="calc-panel">
+                <div style="font-weight:700;margin-bottom:8px">מחשבון חופשי</div>
+                <div id="quickRows"></div>
+                <div class="calc-row" style="margin-top:8px">
+                  <button class="calc-btn acc" id="addQuick">הוסף</button>
+                  <button class="calc-btn warn" id="clearQuick">נקה</button>
+                  <span style="flex:1"></span>
+                  <div style="align-self:center">סה״כ: <b id="quickSum">₪0</b></div>
+                </div>
+              </div>
+            </section>
+        
+            <section class="calc-panel" style="margin-top:16px">
+                <div style="overflow-x:auto">
+                  <table class="calc-table">
+                    <thead>
+                      <tr>
+                        <th>סוג</th>
+                        <th>כמות</th>
+                        <th>שעות</th>
+                        <th>סה״כ</th>
+                      </tr>
+                    </thead>
+                    <tbody id="details"></tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="3">סה״כ כולל</td>
+                        <td id="detailsTotal">₪0</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+            </section>
+            
+            <div style="text-align:center; margin-top:20px; font-size:0.8rem; color:#888;">
+                נבנה ע"י אור כהן
+            </div>
+        </div>
         <div class="ad-spacer"></div>
     </div>
 
     <div id="page-premium" class="page">
-        <header style="padding-bottom: 20px;"><h2>Premium</h2></header>
+        <header class="app-header" style="padding-bottom: 20px;"><h2>Premium</h2></header>
         <div id="premium-content" style="padding: 20px; text-align: center;">
             <div style="background: linear-gradient(135deg, #FFD700, #FDB931); padding:30px; border-radius:20px; color:#333; box-shadow:0 10px 20px rgba(0,0,0,0.1);">
                 <h1><i class="fas fa-crown"></i></h1>
@@ -352,12 +435,14 @@
     </div>
 
     <script>
-        // --- State ---
+        /* ============================ */
+        /* === MAIN APP LOGIC START === */
+        /* ============================ */
+        
         let currentDate = new Date();
         let isDarkMode = localStorage.getItem('darkMode') === 'true';
         let chartInstance = null;
 
-        // Data Structure
         let appData = JSON.parse(localStorage.getItem('budgetUltimateDataV7')) || {
             categories: [
                 { id: 1, name: 'מזון', emoji: '🍕', limit: 2000, items: [] },
@@ -371,34 +456,19 @@
             isPremium: false
         };
 
-        // Shift Definitions based on CSV
-        const shiftDefinitions = [
-            { name: "בוקר", breakdown: [{h:8, p:100}] },
-            { name: "ערב", breakdown: [{h:8, p:120}] },
-            { name: "לילה", breakdown: [{h:8, p:150}] },
-            { name: "שישי ערב (קיץ) 18:00", breakdown: [{h:3, p:120}, {h:5, p:250}] },
-            { name: "שישי לילה / שבת לילה", breakdown: [{h:8, p:300}] },
-            { name: "שבת בוקר / שבת ערב", breakdown: [{h:8, p:225}] },
-            { name: "רצף מערב לבוקר (בוקר)", breakdown: [{h:2, p:125}, {h:6, p:150}] },
-            { name: "רצף משבת ערב לראשון בוקר", breakdown: [{h:2, p:187}, {h:6, p:225}] }, // Corrected approximation based on CSV logic
-            { name: "כפולה 7-19", breakdown: [{h:8, p:100}, {h:2, p:120}, {h:2, p:150}] },
-            { name: "כפולה 8-20", breakdown: [{h:7, p:100}, {h:2, p:120}, {h:1, p:125}, {h:2, p:150}] },
-            { name: "כפולה 9-21", breakdown: [{h:6, p:100}, {h:2, p:120}, {h:2, p:125}, {h:2, p:150}] },
-            { name: "כפולה 10-22", breakdown: [{h:5, p:100}, {h:4, p:120}, {h:2, p:125}, {h:1, p:150}] },
-            { name: "כפולה 11-23", breakdown: [{h:4, p:100}, {h:4, p:120}, {h:2, p:125}, {h:2, p:150}] },
-            { name: "חד יומי (7-19)", breakdown: [{h:8, p:100}, {h:2, p:125}, {h:5, p:150}] }
-        ];
-
-        // --- Init ---
+        // --- Init Main App ---
         document.addEventListener('DOMContentLoaded', () => {
             if(isDarkMode) document.body.classList.add('dark-mode');
-            document.getElementById('bank-input').value = appData.bank || '';
             
+            // Dashboard Init
+            document.getElementById('bank-input').value = appData.bank || '';
             checkAndRunRecurring();
             updateMonthDisplay();
             renderApp();
-            renderShiftCalculator(); // Render the shift list
             checkPremiumStatus();
+
+            // Calculator Init (Shift Calc)
+            initShiftCalculator();
         });
 
         // --- Navigation ---
@@ -413,9 +483,7 @@
         }
 
         // --- Dashboard Logic ---
-        function getMonthKey(date) {
-            return `${date.getMonth()}-${date.getFullYear()}`;
-        }
+        function getMonthKey(date) { return `${date.getMonth()}-${date.getFullYear()}`; }
 
         function updateSalary() {
             const val = document.getElementById('salary-input').value;
@@ -429,7 +497,6 @@
             appData.bank = document.getElementById('bank-input').value;
             localStorage.setItem('budgetUltimateDataV7', JSON.stringify(appData));
             renderApp();
-            
             // Widget Hook
             const finalBalanceText = document.getElementById('global-balance').innerText;
             if (typeof Android !== 'undefined' && Android.updateBalanceWidget) {
@@ -438,7 +505,6 @@
         }
 
         function renderApp() {
-            // טען משכורת לחודש נוכחי
             const salaryInput = document.getElementById('salary-input');
             const key = getMonthKey(currentDate);
             salaryInput.value = (appData.monthlySalaries && appData.monthlySalaries[key]) ? appData.monthlySalaries[key] : '';
@@ -537,23 +603,17 @@
             });
         }
 
-        // --- Recurring (Fixed) ---
+        // --- Recurring (Parallel Add) ---
         function renderRecurringPage() {
-            const container = document.getElementById('recurring-list-container');
-            container.innerHTML = '';
-            
+            const container = document.getElementById('recurring-list-container'); container.innerHTML = '';
             const select = document.getElementById('rec-cat-select');
-            if(select) {
-                select.innerHTML = appData.categories.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
-            }
-
+            if(select) select.innerHTML = appData.categories.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
             if (!appData.recurringSettings) appData.recurringSettings = [];
-
+            
             if (appData.recurringSettings.length === 0) {
                  container.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.6">אין הוראות קבע</div>';
                  return;
             }
-
             appData.recurringSettings.forEach((rec, index) => {
                 const catName = appData.categories.find(c => c.id == rec.catId)?.name || '?';
                 const el = document.createElement('div');
@@ -569,10 +629,9 @@
             const catId = document.getElementById('rec-cat-select').value;
             if(!text || !amount) return;
             
-            // שמירה בהגדרות
             appData.recurringSettings.push({ text, amount, catId });
             
-            // הוספה מיידית לחודש הנוכחי
+            // Add immediately to current month
             const cat = appData.categories.find(c => c.id == catId);
             if(cat) {
                 cat.items.push({
@@ -610,44 +669,6 @@
                 appData.lastProcessedMonth = currentMonthKey;
                 localStorage.setItem('budgetUltimateDataV7', JSON.stringify(appData));
             }
-        }
-
-        // --- Salary Calculator (Updated) ---
-        function renderShiftCalculator() {
-            const container = document.getElementById('shifts-list');
-            container.innerHTML = '';
-            shiftDefinitions.forEach((shift, index) => {
-                const el = document.createElement('div');
-                el.className = 'shift-row';
-                el.innerHTML = `
-                    <span class="shift-name">${shift.name}</span>
-                    <input type="number" id="shift-cnt-${index}" class="shift-input" placeholder="0">
-                `;
-                container.appendChild(el);
-            });
-        }
-
-        function calculateSalary() {
-            const rate = parseFloat(document.getElementById('calc-rate').value) || 0;
-            const bonus = parseFloat(document.getElementById('calc-bonus').value) || 0;
-            const tax = parseFloat(document.getElementById('calc-tax').value) || 0;
-            
-            let totalPay = 0;
-
-            shiftDefinitions.forEach((shift, index) => {
-                const count = parseFloat(document.getElementById(`shift-cnt-${index}`).value) || 0;
-                if(count > 0) {
-                    let payForOneShift = 0;
-                    shift.breakdown.forEach(part => {
-                        // pay = hours * (percent/100) * rate
-                        payForOneShift += part.h * (part.p / 100) * rate;
-                    });
-                    totalPay += payForOneShift * count;
-                }
-            });
-
-            const finalNet = totalPay + bonus - tax;
-            document.getElementById('calc-total-display').innerText = formatMoney(finalNet);
         }
 
         // --- Standard Actions ---
@@ -700,6 +721,188 @@
         function checkPremiumStatus() { if(appData.isPremium) { document.querySelectorAll('.ad-spacer').forEach(e=>e.style.display='none'); document.body.style.paddingBottom="80px"; } }
         function buyPremium() { if(confirm("האם לאשר רכישת פרימיום?")) { appData.isPremium = true; localStorage.setItem('budgetUltimateDataV7', JSON.stringify(appData)); checkPremiumStatus(); alert("תודה שנרשמת!"); } }
         function exportToCSV() {}
+
+        /* =========================================== */
+        /* === SHIFT CALCULATOR LOGIC (INTEGRATED) === */
+        /* =========================================== */
+        function initShiftCalculator() {
+            const $ = s => document.querySelector(s);
+            const now = new Date();
+            const ymDefault = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+            const CFG_KEY = 'ssc:cfg';
+            const countsKey = ym => `ssc:counts:${ym}`;
+            const quickKey  = ym => `ssc:quick:${ym}`;
+
+            const state = {
+              hourly: 0,
+              defaultHours: 8,
+              currency: '₪',
+              ym: ymDefault,
+              categories: sampleCategories(),
+              counts: {},
+              quickRows: []
+            };
+
+            // load
+            try{ const cfg = JSON.parse(localStorage.getItem(CFG_KEY)||'null'); if(cfg){ state.hourly=cfg.hourly; state.defaultHours=cfg.defaultHours; state.currency=cfg.currency; if(cfg.categories) state.categories=cfg.categories; } }catch{}
+            
+            // Elements
+            const hourlyInp = $('#hourly'), monthInp = $('#month'), defaultHoursInp = $('#defaultHours'), currencySel = $('#currency');
+            const grid = $('#grid'), totalShiftsEl = $('#totalShifts'), totalHoursEl = $('#totalHours'), grandTotalEl = $('#grandTotal');
+            const detailsBody = $('#details'), detailsTotal = $('#detailsTotal');
+            const quickRowsEl = $('#quickRows'), addQuick = $('#addQuick'), clearQuick = $('#clearQuick'), quickSumEl = $('#quickSum');
+
+            // Init values
+            monthInp.value = state.ym;
+            hourlyInp.value = state.hourly || '';
+            defaultHoursInp.value = state.defaultHours;
+            currencySel.value = state.currency;
+            loadData(); renderAll();
+
+            // Events
+            hourlyInp.oninput = () => { state.hourly = +hourlyInp.value || 0; saveCfg(); renderAll(); };
+            defaultHoursInp.oninput = () => { state.defaultHours = +defaultHoursInp.value || 0; saveCfg(); renderAll(); };
+            currencySel.onchange = () => { state.currency = currencySel.value; saveCfg(); renderAll(); };
+            monthInp.onchange = () => { state.ym = monthInp.value || ymDefault; loadData(); renderAll(); };
+            $('#resetMonth').onclick = () => { state.counts = {}; saveData(); renderAll(); };
+            
+            addQuick.onclick  = () => { state.quickRows.push({label:'',hours:0,percent:100}); saveQuick(); renderQuick(); };
+            clearQuick.onclick= () => { state.quickRows = []; saveQuick(); renderQuick(); };
+
+            // Logic
+            function loadData() {
+                try{ state.counts = JSON.parse(localStorage.getItem(countsKey(state.ym))||'{}'); }catch{ state.counts = {}; }
+                try{ state.quickRows = JSON.parse(localStorage.getItem(quickKey(state.ym))||'[]'); }catch{ state.quickRows = []; }
+                for(const c of state.categories){ if(!(c.id in state.counts)) state.counts[c.id]=0; }
+            }
+            function saveCfg() { localStorage.setItem(CFG_KEY, JSON.stringify({hourly:state.hourly, defaultHours:state.defaultHours, currency:state.currency, categories:state.categories})); }
+            function saveData() { localStorage.setItem(countsKey(state.ym), JSON.stringify(state.counts)); }
+            function saveQuick(){ localStorage.setItem(quickKey(state.ym), JSON.stringify(state.quickRows)); }
+
+            function renderAll() { renderGrid(); renderQuick(); renderSummary(); renderDetails(); }
+
+            function renderGrid() {
+              grid.innerHTML = '';
+              for(const c of state.categories){
+                const n = state.counts[c.id]||0;
+                const info = describeSlices(c);
+                const subtotal = payForCategory(c,n);
+                const card = document.createElement('div');
+                card.className='calc-card';
+                card.innerHTML = `
+                  <h3>${c.name}</h3>
+                  <div class="calc-meta">${info.hoursText} • ${info.mixText}</div>
+                  <div class="calc-counter">
+                    <button class="calc-iconbtn minus" data-id="${c.id}" data-delta="-1">−</button>
+                    <div class="calc-count">${n}</div>
+                    <button class="calc-iconbtn plus" data-id="${c.id}" data-delta="1">+</button>
+                  </div>
+                  <div class="calc-meta" style="text-align:end">סה״כ: <b>${fmt(subtotal)}</b></div>
+                `;
+                grid.appendChild(card);
+              }
+              grid.querySelectorAll('.calc-iconbtn').forEach(b=>{
+                b.onclick=()=>{
+                  const id=b.getAttribute('data-id'); const d=+b.getAttribute('data-delta');
+                  state.counts[id]=Math.max(0,(state.counts[id]||0)+d); saveData(); renderAll();
+                };
+              });
+            }
+
+            function renderQuick(){
+              quickRowsEl.innerHTML = '';
+              state.quickRows.forEach((row,i)=>{
+                const wrap=document.createElement('div'); wrap.className='calc-row'; wrap.style.marginTop='6px';
+                wrap.innerHTML = `
+                  <label style="flex:2"><small>שם</small><input type="text" class="calc-inp" value="${row.label||''}" data-i="${i}" data-k="label"></label>
+                  <label style="flex:1"><small>שעות</small><input type="number" class="calc-inp" step="0.25" min="0" value="${row.hours||0}" data-i="${i}" data-k="hours"></label>
+                  <label style="flex:1"><small>%</small><input type="number" class="calc-inp" step="1" min="0" value="${row.percent||100}" data-i="${i}" data-k="percent"></label>
+                  <button class="calc-btn ghost" data-i="${i}" data-act="del" style="margin-bottom:2px">X</button>
+                `;
+                quickRowsEl.appendChild(wrap);
+              });
+              quickRowsEl.querySelectorAll('input').forEach(inp=>{
+                inp.oninput = () => {
+                  const i=+inp.getAttribute('data-i'); const k=inp.getAttribute('data-k');
+                  state.quickRows[i][k] = (k==='label') ? inp.value : (+inp.value||0);
+                  saveQuick(); renderSummary(); renderDetails();
+                };
+              });
+              quickRowsEl.querySelectorAll('[data-act="del"]').forEach(btn=>{
+                btn.onclick=()=>{ const i=+btn.getAttribute('data-i'); state.quickRows.splice(i,1); saveQuick(); renderQuick(); renderSummary(); renderDetails(); };
+              });
+              quickSumEl.textContent = fmt(quickTotals().sum);
+            }
+
+            function renderSummary(){
+              let shifts=0, hours=0, total=0;
+              for(const c of state.categories){
+                const n = state.counts[c.id]||0; shifts+=n; hours+= n*sumSliceHours(c); total+=payForCategory(c,n);
+              }
+              const q = quickTotals(); hours += q.hours; total += q.sum;
+              totalShiftsEl.textContent = shifts;
+              totalHoursEl.textContent  = round2(hours);
+              grandTotalEl.textContent  = fmt(total);
+            }
+
+            function renderDetails(){
+              detailsBody.innerHTML = '';
+              let sum=0;
+              for(const c of state.categories){
+                const n=state.counts[c.id]||0; if(!n) continue;
+                const sHours=sumSliceHours(c);
+                const subtotal=payForCategory(c,n); sum+=subtotal;
+                const tr=document.createElement('tr');
+                tr.innerHTML = `<td>${c.name}</td><td>${n}</td><td>${sHours}</td><td>${fmt(subtotal)}</td>`;
+                detailsBody.appendChild(tr);
+              }
+              const qt = quickTotals();
+              if(qt.hours>0 || qt.sum>0){
+                const tr=document.createElement('tr');
+                tr.innerHTML = `<td>חופשי</td><td>-</td><td>${round2(qt.hours)}</td><td>${fmt(qt.sum)}</td>`;
+                detailsBody.appendChild(tr);
+                sum += qt.sum;
+              }
+              detailsTotal.textContent = fmt(sum);
+            }
+
+            // Helpers
+            function fmt(n){ n=Math.round((n+Number.EPSILON)*100)/100; return state.currency + n.toLocaleString('he-IL'); }
+            function round2(x){ return Math.round(x*100)/100; }
+            function sumSliceHours(c){ return c.slices?.length ? round2(c.slices.reduce((a,s)=>a+(+s.hours||0),0)) : (+c.hours || state.defaultHours || 0); }
+            function payForOneShift(c){
+              const h=state.hourly; if(!h) return 0;
+              if(c.slices?.length) return c.slices.reduce((sum,s)=> sum + h*((+s.percent||0)/100)*(+s.hours||0), 0);
+              return h * (+c.hours || state.defaultHours || 0);
+            }
+            function payForCategory(c,n){ return payForOneShift(c) * (n||0); }
+            function describeSlices(c){
+              if(c.slices?.length){
+                const hours=sumSliceHours(c);
+                const mix=c.slices.map(s=>`${(+s.percent||0)}%×${(+s.hours||0)}`).join(' + ');
+                return {hoursText:`${hours}ש׳`, mixText:mix};
+              }
+              return {hoursText:`${+c.hours||0}ש׳`, mixText:'רגיל'};
+            }
+            function quickTotals(){
+              let sum=0, hours=0; const hourly=state.hourly||0;
+              for(const r of state.quickRows){ const h=+r.hours||0; const p=(+r.percent||0)/100; sum += hourly*h*p; hours += h; }
+              return {sum, hours};
+            }
+            function sampleCategories(){
+              let id=0; const nid=()=>'d'+(++id);
+              return [
+                {id:nid(),name:'בוקר',hours:8,slices:[{percent:100,hours:8}]},
+                {id:nid(),name:'ערב',hours:8,slices:[{percent:120,hours:8}]},
+                {id:nid(),name:'לילה',hours:8,slices:[{percent:150,hours:8}]},
+                {id:nid(),name:'שישי ערב (קיץ)',hours:8,slices:[{percent:120,hours:3},{percent:250,hours:5}]},
+                {id:nid(),name:'שישי לילה / שבת',hours:8,slices:[{percent:300,hours:8}]},
+                {id:nid(),name:'שבת בוקר/ערב',hours:8,slices:[{percent:225,hours:8}]},
+                {id:nid(),name:'כפולה 7-19',hours:12,slices:[{percent:100,hours:8},{percent:120,hours:2},{percent:150,hours:2}]},
+                {id:nid(),name:'כפולה 8-20',hours:12,slices:[{percent:100,hours:7},{percent:120,hours:2},{percent:125,hours:1},{percent:150,hours:2}]}
+              ];
+            }
+        }
     </script>
 </body>
 </html>

@@ -163,6 +163,22 @@
         .ssc-secret-box:hover { opacity: 1; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* --- עיצוב כפתורי בחירת צבע (עבור קופות חיסכון) --- */
+.color-opt {
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%; /* הופך את הריבוע לעיגול */
+    cursor: pointer;
+    border: 3px solid transparent; /* מסגרת שקופה כברירת מחדל */
+    transition: 0.2s;
+}
+
+/* זה מה שקורה כשבוחרים צבע (מוסיף מסגרת שחורה ומגדיל קצת) */
+.color-opt.selected {
+    border-color: #333; 
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
     </style>
 </head>
 <body>
@@ -335,13 +351,44 @@
     </div>
 
     <div id="goal-modal" class="modal-overlay">
-        <div class="modal-card">
-            <h3>יעד חיסכון חדש</h3>
-            <input type="text" id="new-goal-name" class="qa-input" style="width:100%; margin-bottom:15px" placeholder="שם היעד (למשל: חופשה)">
-            <input type="number" id="new-goal-target" class="qa-input" style="width:100%; margin-bottom:15px" placeholder="סכום יעד">
-            <div style="display:flex; gap:10px;"><button class="btn-primary" style="background:#ccc; color:#333" onclick="document.getElementById('goal-modal').classList.remove('open')">ביטול</button><button class="btn-primary" onclick="confirmAddGoal()">שמור</button></div>
+    <div class="modal-card">
+        <h3>יעד חיסכון חדש</h3>
+        
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <input type="text" id="new-goal-emoji" class="qa-input" style="width:60px; text-align:center;" value="✈️" placeholder="סמל">
+            <input type="text" id="new-goal-name" class="qa-input" style="flex:1;" placeholder="שם היעד (למשל: חופשה)">
+        </div>
+
+        <input type="number" id="new-goal-target" class="qa-input" style="width:100%; margin-bottom:15px" placeholder="סכום יעד">
+
+        <label style="display:block; margin-bottom:8px; font-size:0.9rem;">בחר צבע כרטיס:</label>
+        <div class="color-picker-row" style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
+            <div class="color-opt selected" onclick="selectGoalColor(this, 'linear-gradient(135deg, #a8e063, #56ab2f)')" style="background: linear-gradient(135deg, #a8e063, #56ab2f);"></div>
+            <div class="color-opt" onclick="selectGoalColor(this, 'linear-gradient(135deg, #ff9966, #ff5e62)')" style="background: linear-gradient(135deg, #ff9966, #ff5e62);"></div>
+            <div class="color-opt" onclick="selectGoalColor(this, 'linear-gradient(135deg, #56CCF2, #2F80ED)')" style="background: linear-gradient(135deg, #56CCF2, #2F80ED);"></div>
+            <div class="color-opt" onclick="selectGoalColor(this, 'linear-gradient(135deg, #834d9b, #d04ed6)')" style="background: linear-gradient(135deg, #834d9b, #d04ed6);"></div>
+        </div>
+        <input type="hidden" id="new-goal-color" value="linear-gradient(135deg, #a8e063, #56ab2f)">
+
+        <div style="display:flex; gap:10px;">
+            <button class="btn-primary" style="background:#ccc; color:#333" onclick="document.getElementById('goal-modal').classList.remove('open')">ביטול</button>
+            <button class="btn-primary" onclick="confirmAddGoal()">שמור</button>
         </div>
     </div>
+</div>
+
+<div id="deposit-modal" class="modal-overlay">
+    <div class="modal-card">
+        <h3>הפקדה ליעד</h3>
+        <p id="deposit-goal-name" style="margin-bottom:15px; opacity:0.7;">...</p>
+        <input type="number" id="deposit-amount" class="qa-input" style="width:100%; margin-bottom:15px" placeholder="סכום להפקדה">
+        <input type="hidden" id="deposit-goal-index">
+        <div style="display:flex; gap:10px;">
+            <button class="btn-primary" style="background:#ccc; color:#333" onclick="document.getElementById('deposit-modal').classList.remove('open')">ביטול</button>
+            <button class="btn-primary" onclick="confirmDeposit()">הפקד</button>
+        </div>
+    </div>
+</div>
 
     <div id="limit-modal" class="modal-overlay">
         <div class="modal-card">
@@ -435,23 +482,87 @@
         }
 
         // --- Savings ---
-        function renderSavings() {
-            const list = document.getElementById('savings-list'); list.innerHTML = '';
-            if(!appData.goals) appData.goals = [];
-            appData.goals.forEach((goal, i) => {
-                const percent = Math.min(100, (goal.current / goal.target) * 100);
-                const el = document.createElement('div'); el.className = 'saving-card';
-                el.innerHTML = `<div class="saving-header"><b>${goal.name}</b><span>${formatMoney(goal.current)} / ${formatMoney(goal.target)}</span></div><div class="saving-progress-bg"><div class="saving-progress-fill" style="width:${percent}%"></div></div><div style="text-align:left; margin-top:5px"><button style="background:rgba(255,255,255,0.2); border:none; color:white; border-radius:5px; padding:2px 8px; cursor:pointer" onclick="depositToGoal(${i})">+ הפקדה</button> <button style="background:none; border:none; color:white; cursor:pointer" onclick="deleteGoal(${i})">×</button></div>`;
-                list.appendChild(el);
-            });
-        }
-        function openGoalModal() { document.getElementById('goal-modal').classList.add('open'); }
-        function confirmAddGoal() {
-            const name = document.getElementById('new-goal-name').value; const target = document.getElementById('new-goal-target').value;
-            if(name && target) { appData.goals.push({name, target:parseFloat(target), current:0}); saveAndRender(); document.getElementById('goal-modal').classList.remove('open'); }
-        }
-        function depositToGoal(i) { const amount = parseFloat(prompt("כמה להפקיד?")); if(amount) { appData.goals[i].current += amount; saveAndRender(); } }
-        function deleteGoal(i) { if(confirm("למחוק?")) { appData.goals.splice(i, 1); saveAndRender(); } }
+        // פונקציית עזר לבחירת צבע במודאל
+function selectGoalColor(el, color) {
+    document.querySelectorAll('.color-opt').forEach(d => d.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('new-goal-color').value = color;
+}
+
+// שדרוג: רינדור הכרטיסים עם צבע ואימוג'י
+function renderSavings() {
+    const list = document.getElementById('savings-list'); list.innerHTML = '';
+    if(!appData.goals) appData.goals = [];
+    
+    appData.goals.forEach((goal, i) => {
+        const percent = Math.min(100, (goal.current / goal.target) * 100);
+        // שימוש בצבע ובאימוג'י שנשמרו (או ברירת מחדל אם אין)
+        const bg = goal.color || 'linear-gradient(135deg, #a8e063, #56ab2f)';
+        const emoji = goal.emoji || '💰';
+        
+        const el = document.createElement('div');
+        el.className = 'saving-card';
+        el.style.background = bg; // החלת הצבע הנבחר
+        
+        el.innerHTML = `
+            <div class="saving-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:1.5rem; background:rgba(255,255,255,0.2); border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">${emoji}</span>
+                    <div>
+                        <div style="font-weight:bold; font-size:1.1rem;">${goal.name}</div>
+                        <div style="font-size:0.8rem; opacity:0.9;">${formatMoney(goal.current)} / ${formatMoney(goal.target)}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="saving-progress-bg">
+                <div class="saving-progress-fill" style="width:${percent}%"></div>
+            </div>
+            <div style="text-align:left; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
+                <button style="background:rgba(255,255,255,0.2); border:none; color:white; border-radius:8px; padding:6px 12px; cursor:pointer; font-weight:bold;" onclick="openDepositModal(${i})">+ הפקדה</button>
+                <button style="background:rgba(0,0,0,0.1); border:none; color:white; border-radius:8px; width:30px; cursor:pointer;" onclick="deleteGoal(${i})"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+        list.appendChild(el);
+    });
+}
+
+// הוספת יעד חדש עם הנתונים החדשים
+function confirmAddGoal() {
+    const name = document.getElementById('new-goal-name').value;
+    const target = parseFloat(document.getElementById('new-goal-target').value);
+    const emoji = document.getElementById('new-goal-emoji').value || '💰';
+    const color = document.getElementById('new-goal-color').value;
+
+    if(name && target) {
+        appData.goals.push({ name, target, current: 0, emoji, color });
+        saveAndRender();
+        document.getElementById('goal-modal').classList.remove('open');
+        // איפוס שדות
+        document.getElementById('new-goal-name').value = '';
+        document.getElementById('new-goal-target').value = '';
+    }
+}
+
+// פתיחת מודאל הפקדה (במקום prompt)
+function openDepositModal(index) {
+    document.getElementById('deposit-goal-index').value = index;
+    document.getElementById('deposit-goal-name').innerText = "עבור: " + appData.goals[index].name;
+    document.getElementById('deposit-amount').value = ''; // איפוס
+    document.getElementById('deposit-modal').classList.add('open');
+    document.getElementById('deposit-amount').focus();
+}
+
+// אישור הפקדה
+function confirmDeposit() {
+    const index = parseInt(document.getElementById('deposit-goal-index').value);
+    const amount = parseFloat(document.getElementById('deposit-amount').value);
+    
+    if(amount > 0) {
+        appData.goals[index].current += amount;
+        saveAndRender();
+        document.getElementById('deposit-modal').classList.remove('open');
+    }
+}
 
         // --- Chart ---
         function toggleChartType() { chartType = chartType === 'bar' ? 'pie' : 'bar'; renderHistoryChart(); }
@@ -492,7 +603,29 @@
 
         // --- Backup & Modals ---
         function openSettingsModal() { document.getElementById('settings-modal').classList.add('open'); }
-        function exportDataJSON() { const dataStr = JSON.stringify(appData); const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr); const linkElement = document.createElement('a'); linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', 'budget_backup.json'); linkElement.click(); }
+        function exportDataJSON() {
+    const dataStr = JSON.stringify(appData);
+    const fileName = 'budget_backup.json';
+    const file = new File([dataStr], fileName, { type: 'application/json' });
+
+    // בדיקה האם הדפדפן/אפליקציה תומכים בשיתוף קבצים (רוב האנדרואידים המודרניים תומכים)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+            files: [file],
+            title: 'גיבוי Budget Master',
+            text: 'הנה הגיבוי של נתוני התקציב שלי'
+        })
+        .then(() => console.log('Share was successful.'))
+        .catch((error) => console.log('Sharing failed', error));
+    } else {
+        // Fallback למחשב (הורדה רגילה)
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', fileName);
+        linkElement.click();
+    }
+}
         function importDataJSON(input) { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const loadedData = JSON.parse(e.target.result); if(loadedData.categories) { appData = loadedData; saveData(); location.reload(); } } catch(err) { alert("שגיאה"); } }; reader.readAsText(file); }
         function changeMonth(delta) { currentDate.setMonth(currentDate.getMonth() + delta); updateMonthDisplay(); renderApp(); }
         function updateMonthDisplay() { document.getElementById('current-month-display').innerText = currentDate.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' }); }
@@ -590,3 +723,4 @@
     </script>
 </body>
 </html>
+

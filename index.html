@@ -611,7 +611,8 @@
                 
                 // הוספת כפתור מחיקה בפינה
                 const deleteBtnHtml = `<div class="cat-delete-main-btn" onclick="deleteCategoryMain(${cat.id})"><i class="fas fa-times"></i></div>`;
-                const dragHandleHtml = `<div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>`;
+                const dragHandleHtml = `<div class="drag-handle"><i class="fas fa-sort"></i></div>`;
+//const dragHandleHtml = `<div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>`;
                 card.innerHTML = `
                     ${deleteBtnHtml}
                     ${dragHandleHtml}

@@ -57,11 +57,30 @@
         }
 
         /* Hamburger Button */
-        .menu-btn {
-            position: absolute; top: calc(var(--safe-area-top) + 15px); right: 20px;
-            background: rgba(255,255,255,0.2); border: none; color: white; width: 45px; height: 45px;
-            border-radius: 12px; font-size: 1.5rem; cursor: pointer; z-index: 1100; backdrop-filter: blur(5px);
-        }
+        /* כפתור המבורגר משודרג - צף וסגול */
+.menu-btn {
+    position: fixed; /* שינוי מ-absolute ל-fixed כדי שיישאר קבוע במסך */
+    top: 20px;
+    right: 20px;
+    /* הרקע הסגול של האפליקציה */
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%; /* עגול ויפה יותר */
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 1200; /* שיהיה מעל התפריט עצמו */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* צללית להפרדה */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s;
+}
+        /* מחלקה שתפקידה לנעול את המסך */
+body.no-scroll { overflow: hidden; }
+.menu-btn:active { transform: scale(0.9); }
 
         .total-balance { font-size: 3rem; font-weight: 700; direction: ltr; margin: 5px 0 15px 0; text-shadow: 0 4px 10px rgba(0,0,0,0.15); }
         .month-selector { display: flex; justify-content: center; align-items: center; gap: 20px; font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 20px; }
@@ -78,7 +97,7 @@
         /* --- Side Menu --- */
         .side-menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
         .side-menu-overlay.open { opacity: 1; pointer-events: all; }
-        .side-menu { position: fixed; top: 0; right: -280px; bottom: 0; width: 280px; background: var(--card-bg); z-index: 1001; transition: 0.3s; padding: 80px 20px 20px 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 10px; }
+        .side-menu { position: fixed; top: 0; right: -280px; bottom: 0; width: 280px; background: var(--card-bg); z-index: 1001; transition: 0.3s; padding: 100px 20px 20px 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 10px; }
         .side-menu.open { right: 0; }
         .menu-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 12px; color: var(--text-main); font-weight: 500; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
         .menu-item:hover { background: rgba(0,0,0,0.05); }
@@ -471,9 +490,12 @@
         });
 
         function toggleMenu() {
-            document.getElementById('side-menu').classList.toggle('open');
-            document.getElementById('menu-overlay').classList.toggle('open');
-        }
+    document.getElementById('side-menu').classList.toggle('open');
+    document.getElementById('menu-overlay').classList.toggle('open');
+    
+    // הנה הקסם: נועל/משחרר את הגלילה של כל הדף
+    document.body.classList.toggle('no-scroll');
+}
 
         function navTo(pageName) {
             toggleMenu();
@@ -820,3 +842,4 @@
     </script>
 </body>
 </html>
+

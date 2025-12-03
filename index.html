@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Budget Master Pro</title>
+    <title>Budget Master Ultimate v21</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4e54c8">
@@ -205,14 +205,34 @@
 
     <div id="page-recurring" class="page">
         <header class="app-header" style="padding-bottom: 20px;"><h2>הוצאות קבועות</h2></header>
-        <div id="recurring-list-container"></div>
+        
         <div class="recur-add-box">
-            <h3>הוספה חדשה</h3>
-            <input type="text" id="rec-desc" class="qa-input" style="width:100%; margin-bottom:10px" placeholder="שם (למשל: נטפליקס)">
-            <input type="number" id="rec-amount" class="qa-input" style="width:100%; margin-bottom:10px" placeholder="סכום">
-            <select id="rec-cat-select" class="qa-input" style="width:100%"></select>
-            <button class="btn-primary" onclick="addRecurringSetting()">שמור</button>
+            <h3 style="margin-top:0; color:var(--primary); margin-bottom:15px;">+ הוספה חדשה</h3>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="rec-desc" class="qa-input" style="flex:2" placeholder="שם (למשל: נטפליקס)">
+                <input type="number" id="rec-amount" class="qa-input" style="flex:1" placeholder="סכום">
+            </div>
+            <select id="rec-cat-select" class="qa-input" style="width:100%; margin-top:10px; margin-bottom:10px;"></select>
+            <button class="btn-primary" onclick="addRecurringSetting()">שמור הוראה</button>
         </div>
+
+        <div class="ssc-panel" style="margin: 0 15px;">
+            <h3 style="margin-top:0; margin-bottom:10px; color:var(--text-main);">רשימת הוראות פעילות</h3>
+            <div style="overflow-x:auto;">
+                <table class="ssc-table" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:right">שם</th>
+                            <th style="text-align:right">קטגוריה</th>
+                            <th style="text-align:center">סכום</th>
+                            <th style="text-align:center">מחק</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recurring-list-container"></tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="ad-spacer"></div>
     </div>
 
@@ -421,10 +441,13 @@
 
         const motivationQuotes = ["הדרך לעושר מתחילה בשקל הראשון שחוסכים.", "לא משנה כמה אתה מרוויח, משנה כמה אתה שומר.", "תקציב הוא לא כלא, הוא המפתח לחופש.", "כסף הוא משרת נהדר אבל אדון נורא.", "השקעה בעצמך מניבה את הריבית הגבוהה ביותר.", "הוצאות קטנות מצטברות להון גדול.", "שליטה בכסף היא שליטה בחיים.", "העושר האמיתי הוא השקט הנפשי.", "אל תקנה מה שאתה לא צריך.", "תקציב חכם היום = חופש כלכלי מחר."];
 
-        let appData = JSON.parse(localStorage.getItem('budgetUltimateDataV20')) || {
+        let appData = JSON.parse(localStorage.getItem('budgetUltimateDataV21')) || {
             categories: [{ id: 1, name: 'מזון', emoji: '🍕', limit: 2000, items: [] }, { id: 2, name: 'רכב', emoji: '🚗', limit: 800, items: [] }, { id: 3, name: 'חשבונות', emoji: '🏠', limit: 1500, items: [] }],
             goals: [], bank: 0, monthlySalaries: {}, recurringSettings: [], lastProcessedMonth: "", lastLogin: Date.now(), isPremium: false
         };
+
+        // Safety check for existing data migration
+        if(!appData.recurringSettings) appData.recurringSettings = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             if(isDarkMode) document.body.classList.add('dark-mode');
@@ -447,7 +470,7 @@
         function getMonthKey(date) { return `${date.getMonth()}-${date.getFullYear()}`; }
         function updateSalary() { const val = document.getElementById('salary-input').value; const key = getMonthKey(currentDate); if (!appData.monthlySalaries) appData.monthlySalaries = {}; appData.monthlySalaries[key] = val; saveAndRender(); }
         function saveAndRender() { appData.bank = document.getElementById('bank-input').value; saveData(); renderApp(); if (typeof Android !== 'undefined' && Android.updateBalanceWidget) Android.updateBalanceWidget(document.getElementById('global-balance').innerText); }
-        function saveData() { localStorage.setItem('budgetUltimateDataV20', JSON.stringify(appData)); }
+        function saveData() { localStorage.setItem('budgetUltimateDataV21', JSON.stringify(appData)); }
 
         function renderApp() {
             const salaryInput = document.getElementById('salary-input'); const key = getMonthKey(currentDate);
@@ -493,7 +516,7 @@
             renderHistoryChart(); renderSavings();
         }
 
-        // --- Savings (FIXED) ---
+        // --- Savings (FIXED MODALS) ---
         function renderSavings() {
             const list = document.getElementById('savings-list'); list.innerHTML = '';
             if(!appData.goals) appData.goals = [];
@@ -502,7 +525,13 @@
                 const bg = goal.color || 'linear-gradient(135deg, #a8e063, #56ab2f)';
                 const emoji = goal.emoji || '💰';
                 const el = document.createElement('div'); el.className = 'saving-card'; el.style.background = bg;
-                el.innerHTML = `<div class="saving-header"><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:1.5rem;background:rgba(255,255,255,0.2);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;">${emoji}</span><div><div style="font-weight:bold;font-size:1.1rem;">${goal.name}</div><div style="font-size:0.8rem;opacity:0.9;">${formatMoney(goal.current)} / ${formatMoney(goal.target)}</div></div></div></div><div class="saving-progress-bg"><div class="saving-progress-fill" style="width:${percent}%"></div></div><div style="text-align:left; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;"><button style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:bold;" onclick="openDepositModal(${i})">+ הפקדה</button><button style="background:rgba(0,0,0,0.1);border:none;color:white;border-radius:8px;width:30px;cursor:pointer;" onclick="deleteGoal(${i})"><i class="fas fa-trash"></i></button></div>`;
+                el.innerHTML = `
+                    <div class="saving-header"><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:1.5rem;background:rgba(255,255,255,0.2);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;">${emoji}</span><div><div style="font-weight:bold;font-size:1.1rem;">${goal.name}</div><div style="font-size:0.8rem;opacity:0.9;">${formatMoney(goal.current)} / ${formatMoney(goal.target)}</div></div></div></div>
+                    <div class="saving-progress-bg"><div class="saving-progress-fill" style="width:${percent}%"></div></div>
+                    <div style="text-align:left; margin-top:10px; display:flex; justify-content:flex-end; gap:10px;">
+                        <button style="background:rgba(255,255,255,0.2);border:none;color:white;border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:bold;" onclick="openDepositModal(${i})">+ הפקדה</button>
+                        <button style="background:rgba(0,0,0,0.1);border:none;color:white;border-radius:8px;width:30px;cursor:pointer;" onclick="deleteGoal(${i})"><i class="fas fa-trash"></i></button>
+                    </div>`;
                 list.appendChild(el);
             });
         }
@@ -517,8 +546,16 @@
             const index = parseInt(document.getElementById('deposit-goal-index').value); const amount = parseFloat(document.getElementById('deposit-amount').value);
             if(amount > 0) { appData.goals[index].current += amount; saveAndRender(); document.getElementById('deposit-modal').classList.remove('open'); }
         }
-        function deleteGoal(i) { document.getElementById('delete-goal-index').value = i; document.getElementById('delete-confirm-modal').classList.add('open'); }
-        function confirmDeleteGoal() { const i = parseInt(document.getElementById('delete-goal-index').value); appData.goals.splice(i, 1); saveAndRender(); document.getElementById('delete-confirm-modal').classList.remove('open'); }
+        function deleteGoal(i) {
+            document.getElementById('delete-goal-index').value = i;
+            document.getElementById('delete-confirm-modal').classList.add('open');
+        }
+        function confirmDeleteGoal() {
+            const i = parseInt(document.getElementById('delete-goal-index').value);
+            appData.goals.splice(i, 1);
+            saveAndRender();
+            document.getElementById('delete-confirm-modal').classList.remove('open');
+        }
 
         // --- Chart ---
         function toggleChartType() { chartType = chartType === 'bar' ? 'pie' : 'bar'; renderHistoryChart(); }
@@ -538,7 +575,7 @@
             chartInstance = new Chart(ctx, config);
         }
 
-        // --- Actions ---
+        // --- Actions (FIXED DELETE) ---
         function addItem(catId) {
             const desc = document.getElementById(`d-${catId}`).value; const amount = document.getElementById(`a-${catId}`).value; const method = document.getElementById(`m-${catId}`).value;
             if(!desc || !amount) return;
@@ -546,9 +583,29 @@
             cat.items.push({ id: Date.now().toString(), text: desc, amount: -Math.abs(val), date: currentDate.toISOString(), method: method });
             saveAndRender();
         }
-        function deleteItem(catId, itemId) { const cat = appData.categories.find(c => c.id === catId); cat.items = cat.items.filter(i => i.id !== itemId); saveAndRender(); }
+        
+        function deleteItem(catId, itemId) {
+    const cat = appData.categories.find(c => c.id === catId);
+    if (!cat) return;
 
-        // --- Backup (Share API) ---
+    const itemToDelete = cat.items.find(i => i.id === itemId);
+
+    // --- לוגיקת סנכרון אוטומטית (ללא הודעה) ---
+    // אם הפריט הזה נוצר מהוראה קבועה - מחק גם את ההוראה הקבועה המקורית מיד
+    if (itemToDelete && itemToDelete.fromRecurId) {
+        if (appData.recurringSettings) {
+            appData.recurringSettings = appData.recurringSettings.filter(rec => rec.id !== itemToDelete.fromRecurId);
+            renderRecurringPage(); // מעדכן את מסך הקבועות ברקע
+        }
+    }
+    // ------------------------------------------
+
+    // מחיקת הפריט מהרשימה הנוכחית
+    cat.items = cat.items.filter(i => i.id !== itemId);
+    saveAndRender();
+}
+
+        // --- Backup (Fixed with Share API) ---
         function openSettingsModal() { document.getElementById('settings-modal').classList.add('open'); }
         async function exportDataJSON() {
             const dataStr = JSON.stringify(appData);
@@ -585,11 +642,92 @@
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); }
         function formatMoney(n) { return n.toLocaleString('he-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 }); }
         function checkPremiumStatus() { if(appData.isPremium) { document.querySelectorAll('.ad-spacer').forEach(e=>e.style.display='none'); document.body.style.paddingBottom="80px"; } }
-        function buyPremium() { if(confirm("האם לאשר רכישת פרימיום?")) { appData.isPremium = true; localStorage.setItem('budgetUltimateDataV20', JSON.stringify(appData)); checkPremiumStatus(); alert("תודה שנרשמת!"); } }
-        function renderRecurringPage() { const container = document.getElementById('recurring-list-container'); container.innerHTML = ''; const select = document.getElementById('rec-cat-select'); if(select) select.innerHTML = appData.categories.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join(''); if (!appData.recurringSettings) appData.recurringSettings = []; appData.recurringSettings.forEach((rec, index) => { const catName = appData.categories.find(c => c.id == rec.catId)?.name || '?'; const el = document.createElement('div'); el.className = 'recur-item'; el.innerHTML = `<div><div style="font-weight:bold">${rec.text}</div><div style="font-size:0.8rem; color:#666">${catName} • ${formatMoney(rec.amount)}</div></div><button style="border:none; background:none; color:var(--danger)" onclick="deleteRecurring(${index})"><i class="fas fa-trash"></i></button>`; container.appendChild(el); }); }
-        function addRecurringSetting() { const text = document.getElementById('rec-desc').value; const amount = parseFloat(document.getElementById('rec-amount').value); const catId = document.getElementById('rec-cat-select').value; if(!text || !amount) return; appData.recurringSettings.push({ text, amount, catId }); const cat = appData.categories.find(c => c.id == catId); if(cat) { cat.items.push({ id: Date.now().toString(), text: text + ' (קבוע)', amount: -Math.abs(amount), date: currentDate.toISOString(), isAuto: true, method: 'credit' }); } saveAndRender(); document.getElementById('rec-desc').value = ''; document.getElementById('rec-amount').value = ''; renderRecurringPage(); showAppAlert('בוצע', 'ההוצאה נשמרה ותתווסף כל חודש', '✅'); }
-        function deleteRecurring(index) { appData.recurringSettings.splice(index, 1); localStorage.setItem('budgetUltimateDataV20', JSON.stringify(appData)); renderRecurringPage(); }
-        function checkAndRunRecurring() { const now = new Date(); const currentMonthKey = `${now.getMonth()}-${now.getFullYear()}`; if(appData.lastProcessedMonth !== currentMonthKey) { if (appData.recurringSettings) { appData.recurringSettings.forEach(rec => { const cat = appData.categories.find(c => c.id == rec.catId); if(cat) cat.items.push({ id: 'auto_'+Date.now()+Math.random(), text: rec.text, amount: -Math.abs(rec.amount), date: now.toISOString(), isAuto: true, method:'credit' }); }); } appData.lastProcessedMonth = currentMonthKey; localStorage.setItem('budgetUltimateDataV20', JSON.stringify(appData)); } }
+        function buyPremium() { if(confirm("האם לאשר רכישת פרימיום?")) { appData.isPremium = true; localStorage.setItem('budgetUltimateDataV21', JSON.stringify(appData)); checkPremiumStatus(); alert("תודה שנרשמת!"); } }
+        
+        // --- Recurring (Updated with table) ---
+        function renderRecurringPage() {
+            const container = document.getElementById('recurring-list-container');
+            container.innerHTML = '';
+            const select = document.getElementById('rec-cat-select');
+            if(select) {
+                select.innerHTML = appData.categories.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
+            }
+
+            if (!appData.recurringSettings || appData.recurringSettings.length === 0) {
+                 container.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#999;">אין הוראות קבע מוגדרות</td></tr>';
+                 return;
+            }
+
+            appData.recurringSettings.forEach((rec, index) => {
+                const cat = appData.categories.find(c => c.id == rec.catId);
+                const catName = cat ? (cat.emoji + ' ' + cat.name) : 'לא ידוע';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:bold;">${rec.text}</td>
+                    <td style="color:var(--text-sec); font-size:0.85rem;">${catName}</td>
+                    <td style="text-align:center; direction:ltr;">${formatMoney(rec.amount)}</td>
+                    <td style="text-align:center;">
+                        <button onclick="deleteRecurring(${index})" style="background:rgba(255, 118, 117, 0.1); color:var(--danger); border:none; width:30px; height:30px; border-radius:50%; cursor:pointer;">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+        }
+
+        function addRecurringSetting() {
+            const text = document.getElementById('rec-desc').value;
+            const amount = parseFloat(document.getElementById('rec-amount').value);
+            const catId = document.getElementById('rec-cat-select').value;
+
+            if(!text || !amount) return;
+
+            const uniqueRecurId = Date.now() + Math.random(); 
+
+            appData.recurringSettings.push({ 
+                id: uniqueRecurId, 
+                text: text, 
+                amount: amount, 
+                catId: catId 
+            });
+
+            const cat = appData.categories.find(c => c.id == catId);
+            if(cat) {
+                cat.items.push({
+                    id: Date.now().toString(),
+                    text: text + ' (קבוע)',
+                    amount: -Math.abs(amount),
+                    date: currentDate.toISOString(),
+                    isAuto: true,
+                    method: 'credit',
+                    fromRecurId: uniqueRecurId
+                });
+            }
+
+            saveAndRender();
+            document.getElementById('rec-desc').value = '';
+            document.getElementById('rec-amount').value = '';
+            renderRecurringPage();
+            showAppAlert('בוצע', 'ההוצאה סונכרנה ונוספה לחודש הנוכחי', '✅');
+        }
+
+        function deleteRecurring(index) {
+            const settingToDelete = appData.recurringSettings[index];
+            appData.recurringSettings.splice(index, 1);
+            
+            if (settingToDelete.id) {
+                appData.categories.forEach(cat => {
+                    cat.items = cat.items.filter(item => item.fromRecurId !== settingToDelete.id);
+                });
+            }
+
+            localStorage.setItem('budgetUltimateDataV21', JSON.stringify(appData)); 
+            renderRecurringPage();
+            saveAndRender(); 
+        }
+
+        function checkAndRunRecurring() { const now = new Date(); const currentMonthKey = `${now.getMonth()}-${now.getFullYear()}`; if(appData.lastProcessedMonth !== currentMonthKey) { if (appData.recurringSettings) { appData.recurringSettings.forEach(rec => { const cat = appData.categories.find(c => c.id == rec.catId); if(cat) cat.items.push({ id: 'auto_'+Date.now()+Math.random(), text: rec.text, amount: -Math.abs(rec.amount), date: now.toISOString(), isAuto: true, method:'credit' }); }); } appData.lastProcessedMonth = currentMonthKey; localStorage.setItem('budgetUltimateDataV21', JSON.stringify(appData)); } }
 
         /* === CUSTOM ALERT LOGIC === */
         function showAppAlert(title, message, icon = '✅', callback = null) {
@@ -649,7 +787,11 @@
             function resetEditor(){ els.newName.value=''; els.newSlices.innerHTML=''; addEditorSlice(100, 8); }
             function addEditorSlice(p=100, h=0){ 
                 const div=document.createElement('div'); div.className='ssc-editor-slice'; 
-                div.innerHTML=`<div style="flex:1; display:flex; flex-direction:column;"><span style="font-size:10px;color:#666">אחוז (%)</span><input type="number" class="ssc-inp e-p" value="${p}"></div><div style="flex:1; display:flex; flex-direction:column;"><span style="font-size:10px;color:#666">שעות</span><input type="number" class="ssc-inp e-h" value="${h}" step="0.5"></div><button class="ssc-btn-close-slice" onclick="this.parentElement.remove()" style="margin-top:15px;"><i class="fas fa-times"></i></button>`; 
+                div.innerHTML=`
+                    <div style="flex:1; display:flex; flex-direction:column;"><span style="font-size:10px;color:#666">אחוז (%)</span><input type="number" class="ssc-inp e-p" value="${p}"></div>
+                    <div style="flex:1; display:flex; flex-direction:column;"><span style="font-size:10px;color:#666">שעות</span><input type="number" class="ssc-inp e-h" value="${h}" step="0.5"></div>
+                    <button class="ssc-btn-close-slice" onclick="this.parentElement.remove()" style="margin-top:15px;"><i class="fas fa-times"></i></button>
+                `; 
                 els.newSlices.appendChild(div); 
             }
             

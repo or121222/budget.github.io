@@ -1,5 +1,5 @@
 {
-    "name": "Budgetln",
+    "name": "Neto",
     "short_name": "התקציב שלי",
     "start_url": "./index.html",
     "display": "standalone",
@@ -14,6 +14,7 @@
         }
     ]
 }
+
 
 
 

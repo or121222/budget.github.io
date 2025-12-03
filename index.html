@@ -126,10 +126,30 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            cursor: grab; /* סמן יד לגרירה */
+            cursor: default; /* סמן יד לגרירה */
         }
-        .card-header:active { cursor: grabbing; }
+        /*.card-header:active { cursor: grabbing; } */
+        /* 2. עיצוב חדש לידית הגרירה */
+.drag-handle {
+    position: absolute;
+    top: 40px; /* ממוקם מתחת לאיקס שנמצא ב-10px */
+    left: 10px;
+    width: 24px;
+    height: 24px;
+    color: #b2bec3; /* צבע אפור עדין */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab; /* רק כאן יהיה סמן גרירה */
+    font-size: 1.2rem;
+    z-index: 10;
+    touch-action: none; /* חשוב למובייל - מונע גלילה כשנוגעים בזה */
+}
 
+.drag-handle:active {
+    cursor: grabbing;
+    color: var(--primary); /* נצבע בכחול כשגוררים */
+}
         /* כפתור מחיקת קטגוריה חדש */
         .cat-delete-main-btn {
             position: absolute;
@@ -591,9 +611,10 @@
                 
                 // הוספת כפתור מחיקה בפינה
                 const deleteBtnHtml = `<div class="cat-delete-main-btn" onclick="deleteCategoryMain(${cat.id})"><i class="fas fa-times"></i></div>`;
-
+                const dragHandleHtml = `<div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>`;
                 card.innerHTML = `
                     ${deleteBtnHtml}
+                    ${dragHandleHtml}
                     <div class="card-header">
                         <div class="cat-info"><div class="cat-emoji">${cat.emoji}</div><div><div style="font-weight:bold">${cat.name}</div><div class="cat-limit" onclick="openLimitModal(${cat.id})">תקציב: ${limit} <i class="fas fa-pen" style="font-size:0.7rem"></i></div></div></div>
                         <div class="current-spend" style="${balanceStyle}">${formatMoney(catTotal)}</div>
@@ -617,7 +638,7 @@
             if(categorySortable) categorySortable.destroy(); // ניקוי כדי למנוע כפילויות
             categorySortable = new Sortable(container, {
                 animation: 150,
-                handle: '.card-header', // גרירה רק מהכותרת
+                handle: '.drag-handle', // גרירה רק מהכותרת
                 onEnd: function (evt) {
                     // עדכון המערך בזיכרון לפי הסדר החדש
                     const item = appData.categories.splice(evt.oldIndex, 1)[0];
@@ -948,3 +969,4 @@ function performCategoryDelete() {
     </script>
 </body>
 </html>
+

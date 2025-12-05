@@ -49,6 +49,59 @@
         .page { display: none; animation: fadeIn 0.3s ease; padding-bottom: 80px; }
         .page.active { display: block; }
 
+        /* --- Landing Page Styles (New) --- */
+        #page-landing {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            z-index: 9999;
+            display: none; /* Toggled by logic */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+            color: white;
+            padding-bottom: 0; /* Override generic page padding */
+        }
+        #page-landing.active { display: flex; }
+        
+        .landing-logo { font-size: 5rem; margin-bottom: 20px; text-shadow: 0 5px 15px rgba(0,0,0,0.2); animation: float 3s ease-in-out infinite; }
+        .landing-title { font-size: 3.5rem; font-weight: 800; margin-bottom: 5px; letter-spacing: 2px; }
+        .landing-subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 40px; font-weight: 300; }
+        
+        .landing-tip-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 50px;
+            max-width: 100%;
+            width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .landing-tip-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 10px; }
+        .landing-tip-text { font-size: 1.1rem; font-style: italic; line-height: 1.5; }
+
+        .btn-start-app {
+            background: white;
+            color: var(--primary);
+            font-size: 1.4rem;
+            font-weight: 700;
+            padding: 18px 60px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-start-app:active { transform: scale(0.95); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+
         /* --- Header --- */
         header.app-header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -128,28 +181,28 @@
             align-items: center; 
             cursor: default; /* סמן יד לגרירה */
         }
-        /*.card-header:active { cursor: grabbing; } */
+        
         /* 2. עיצוב חדש לידית הגרירה */
-.drag-handle {
-    position: absolute;
-    top: 40px; /* ממוקם מתחת לאיקס שנמצא ב-10px */
-    left: 10px;
-    width: 24px;
-    height: 24px;
-    color: #b2bec3; /* צבע אפור עדין */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: grab; /* רק כאן יהיה סמן גרירה */
-    font-size: 1.2rem;
-    z-index: 10;
-    touch-action: none; /* חשוב למובייל - מונע גלילה כשנוגעים בזה */
-}
+        .drag-handle {
+            position: absolute;
+            top: 40px; /* ממוקם מתחת לאיקס שנמצא ב-10px */
+            left: 10px;
+            width: 24px;
+            height: 24px;
+            color: #b2bec3; /* צבע אפור עדין */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab; /* רק כאן יהיה סמן גרירה */
+            font-size: 1.2rem;
+            z-index: 10;
+            touch-action: none; /* חשוב למובייל - מונע גלילה כשנוגעים בזה */
+        }
 
-.drag-handle:active {
-    cursor: grabbing;
-    color: var(--primary); /* נצבע בכחול כשגוררים */
-}
+        .drag-handle:active {
+            cursor: grabbing;
+            color: var(--primary); /* נצבע בכחול כשגוררים */
+        }
         /* כפתור מחיקת קטגוריה חדש */
         .cat-delete-main-btn {
             position: absolute;
@@ -243,6 +296,23 @@
 </head>
 <body>
 
+    <div id="page-landing" class="page active">
+        <div class="landing-logo">
+    <img src="icon-192.png" alt="Logo" style="width: 120px; height: 120px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+</div>
+        <div class="landing-title">Neto</div>
+        <div class="landing-subtitle">ניהול תקציב חכם ופשוט</div>
+        
+        <div class="landing-tip-card">
+            <div class="landing-tip-title"><i class="fas fa-lightbulb"></i> טיפ יומי</div>
+            <div class="landing-tip-text" id="landing-tip-text">...</div>
+        </div>
+
+        <button class="btn-start-app" onclick="navTo('dashboard')">
+            בואו נתחיל <i class="fas fa-arrow-left"></i>
+        </button>
+    </div>
+
     <button class="menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
 
     <div id="menu-overlay" class="side-menu-overlay" onclick="toggleMenu()"></div>
@@ -257,7 +327,7 @@
         <div class="menu-item" onclick="toggleDarkMode()"><i class="fas fa-moon"></i> מצב לילה</div>
     </div>
 
-    <div id="page-dashboard" class="page active">
+    <div id="page-dashboard" class="page">
         <header class="app-header">
             <div style="height:20px"></div>
             <div style="font-weight:700">Neto</div>
@@ -559,6 +629,9 @@
         if(!appData.recurringSettings) appData.recurringSettings = [];
 
         document.addEventListener('DOMContentLoaded', () => {
+            // New Landing Logic:
+            document.getElementById('landing-tip-text').innerText = motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)];
+            
             if(isDarkMode) document.body.classList.add('dark-mode');
             document.getElementById('bank-input').value = appData.bank || '';
             document.getElementById('motivation-text').innerText = motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)];
@@ -574,10 +647,17 @@
         }
 
         function navTo(pageName) {
-            toggleMenu();
+            if(document.getElementById('side-menu').classList.contains('open')) toggleMenu();
+            
+            // If we are leaving the landing page
+            if (pageName === 'dashboard') {
+                document.getElementById('page-landing').classList.remove('active');
+            }
+
             document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
             document.getElementById(`page-${pageName}`).classList.add('active');
+            
             if(pageName === 'dashboard') renderApp();
             if(pageName === 'recurring') renderRecurringPage();
         }
@@ -612,7 +692,7 @@
                 // הוספת כפתור מחיקה בפינה
                 const deleteBtnHtml = `<div class="cat-delete-main-btn" onclick="deleteCategoryMain(${cat.id})"><i class="fas fa-times"></i></div>`;
                 const dragHandleHtml = `<div class="drag-handle"><i class="fas fa-sort"></i></div>`;
-//const dragHandleHtml = `<div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>`;
+
                 card.innerHTML = `
                     ${deleteBtnHtml}
                     ${dragHandleHtml}
@@ -970,4 +1050,3 @@ function performCategoryDelete() {
     </script>
 </body>
 </html>
-

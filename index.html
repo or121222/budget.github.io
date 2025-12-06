@@ -9,30 +9,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Neto</title>
+    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4e54c8">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon-192.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
     <style>
-        :root { --bg-color: #f0f2f5; --card-bg: rgba(255, 255, 255, 0.95); --text-main: #2d3436; --text-sec: #636e72; --glass-border: 1px solid rgba(255, 255, 255, 0.6); --shadow: 0 4px 15px rgba(0, 0, 0, 0.05); --safe-area-top: env(safe-area-inset-top, 20px); --primary: #4e54c8; --secondary: #8f94fb; --danger: #ff7675; --success: #00b894; }
-        body.dark-mode { --bg-color: #1e272e; --card-bg: rgba(45, 52, 54, 0.95); --text-main: #dfe6e9; --text-sec: #b2bec3; --glass-border: 1px solid rgba(255, 255, 255, 0.1); }
-        
-        /* Themes */
+        /* === CSS VARIABLES & THEMES === */
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #2d3436;
+            --text-sec: #636e72;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            --safe-area-top: env(safe-area-inset-top, 20px);
+            
+            /* Default Theme */
+            --primary: #4e54c8;
+            --secondary: #8f94fb;
+            --danger: #ff7675;
+            --success: #00b894;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            --bg-color: #1e272e;
+            --card-bg: rgba(45, 52, 54, 0.95);
+            --text-main: #dfe6e9;
+            --text-sec: #b2bec3;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Themes Override */
         body.theme-ocean { --primary: #006994; --secondary: #48cae4; --success: #0ead69; }
         body.theme-forest { --primary: #2d6a4f; --secondary: #52b788; --success: #40916c; }
         body.theme-sunset { --primary: #f77f00; --secondary: #fcbf49; --success: #d62828; }
         body.theme-luxury { --primary: #1a1a1a; --secondary: #d4af37; --success: #c9a227; }
         body.dark-mode.theme-luxury { --bg-color: #000; --card-bg: rgba(30,30,30,0.95); }
 
+        /* General Styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { font-family: 'Rubik', sans-serif; background-color: var(--bg-color); color: var(--text-main); padding-bottom: 100px; user-select: none; overflow-x: hidden; transition: background-color 0.3s; }
+        
+        /* Animations */
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-item { animation: slideUp 0.3s ease-out forwards; }
 
+        /* RTL/LTR Support */
         html[dir="ltr"] body { direction: ltr; }
         html[dir="ltr"] .menu-btn { right: auto; left: 20px; }
         html[dir="ltr"] .side-menu { right: auto; left: -280px; }
@@ -52,109 +84,17 @@
         html[dir="ltr"] .pin-cancel-btn { right: auto; left: 20px; }
         html[dir="ltr"] .conv-arrow-icon { transform: rotate(180deg); }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: 'Rubik', sans-serif; background-color: var(--bg-color); color: var(--text-main); padding-bottom: 100px; user-select: none; overflow-x: hidden; transition: background-color 0.3s; }
-
+        /* Pages */
         .page { display: none; animation: fadeIn 0.3s ease; padding-bottom: 80px; }
         .page.active { display: block; }
 
-        .side-menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
-        .side-menu-overlay.open { opacity: 1; pointer-events: all; }
-        .side-menu { position: fixed; top: 0; right: -280px; bottom: 0; width: 280px; background: var(--card-bg); z-index: 1001; transition: 0.3s; padding: 100px 20px 20px 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 5px; overflow-y: auto; max-height: 100vh; }
-        .side-menu.open { right: 0; }
-        .menu-item { display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: 12px; color: var(--text-main); font-weight: 500; font-size: 1.05rem; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
-        .menu-item:hover { background: rgba(0,0,0,0.05); }
-        .menu-item.active { background: var(--primary); color: white; }
-
-        /* Vertical Converter */
-        .converter-box { background: var(--card-bg); border-radius: 20px; padding: 25px; margin: 20px; box-shadow: var(--shadow); border: var(--glass-border); text-align: center; display: flex; flex-direction: column; gap: 15px; }
-        .conv-label { text-align: start; font-size: 0.9rem; color: var(--text-sec); margin-bottom: 5px; font-weight: 500; }
-        .conv-input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: rgba(0,0,0,0.02); font-size: 1.5rem; color: var(--text-main); font-weight: bold; text-align: center; outline: none; }
-        .conv-select { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: var(--bg-color); font-size: 1rem; color: var(--text-main); appearance: none; }
-        .conv-swap-container { display: flex; justify-content: center; align-items: center; margin: -5px 0; z-index: 5; }
-        .conv-swap-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--primary); color: white; border: 2px solid var(--card-bg); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 1.2rem; transition: transform 0.2s; }
-        .conv-swap-btn:active { transform: scale(0.9); }
-        .conv-result { margin-top: 10px; padding: 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-radius: 15px; }
-        .conv-res-big { font-size: 2.2rem; font-weight: bold; direction: ltr; }
-        .conv-res-sub { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; direction: ltr; }
-
-        /* General Components */
-        .tool-card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin: 15px; box-shadow: var(--shadow); border: var(--glass-border); }
-        .tool-row { margin-bottom: 15px; }
-        .tool-label { display: block; margin-bottom: 5px; color: var(--text-sec); font-size: 0.9rem; }
-        .tool-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); background: var(--bg-color); color: var(--text-main); font-size: 1.1rem; }
-        .tool-result { margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.03); border-radius: 10px; text-align: center; }
-        .tool-res-val { font-size: 1.8rem; font-weight: bold; color: var(--primary); margin-top: 5px; direction: ltr; }
-        
-        .wishlist-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card-bg); margin-bottom: 10px; border-radius: 12px; box-shadow: var(--shadow); border: var(--glass-border); }
-        .w-info { flex: 1; }
-        .w-name { font-weight: bold; font-size: 1.1rem; }
-        .w-price { color: var(--text-sec); font-size: 0.9rem; margin-top: 3px; }
-        .w-actions { display: flex; gap: 10px; }
-        .w-btn { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; color: white; transition: transform 0.1s; }
-        .w-btn:active { transform: scale(0.9); }
-        .w-btn.buy { background: var(--success); }
-        .w-btn.del { background: var(--danger); opacity: 0.8; }
-
-        .search-container { padding: 0 15px 15px 15px; }
-        .search-input { width: 100%; padding: 12px 40px 12px 15px; border-radius: 25px; border: none; background: rgba(0,0,0,0.05); color: var(--text-main); font-size: 1rem; }
-        .search-icon { position: absolute; top: 12px; left: 25px; color: var(--text-sec); }
-        html[dir="ltr"] .search-input { padding: 12px 15px 12px 40px; }
-        html[dir="ltr"] .search-icon { left: auto; right: 25px; }
-
-        .rec-type-selector { display: flex; gap: 15px; margin-bottom: 15px; justify-content: center; background: rgba(0,0,0,0.03); padding: 10px; border-radius: 10px; }
-        .rec-type-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; font-size: 0.95rem; }
-        .rec-type-label input { accent-color: var(--primary); transform: scale(1.2); }
-
-        #pin-lock-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-color); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-        #pin-lock-screen.active { display: flex; }
-        .pin-cancel-btn { position: absolute; top: 40px; right: 20px; background: transparent; border: none; font-size: 1.5rem; color: var(--text-sec); cursor: pointer; padding: 10px; display: none; }
-        .pin-title { margin-bottom: 20px; font-size: 1.5rem; color: var(--text-main); font-weight: bold; }
-        .pin-subtitle { margin-bottom: 30px; color: var(--text-sec); font-size: 1rem; min-height: 20px; }
-        .pin-dots { display: flex; gap: 15px; margin-bottom: 40px; }
-        .pin-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--primary); transition: 0.2s; }
-        .pin-dot.filled { background: var(--primary); }
-        .pin-dot.error { border-color: var(--danger); background: var(--danger); animation: shake 0.3s; }
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 300px; width: 100%; }
-        .num-btn { background: var(--card-bg); border: var(--glass-border); color: var(--text-main); font-size: 1.5rem; font-weight: 500; height: 70px; border-radius: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow); transition: 0.1s; }
-        .num-btn:active { transform: scale(0.95); background: rgba(0,0,0,0.05); }
-        .num-btn.dummy { visibility: hidden; pointer-events: none; }
-        
-        #page-landing { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, var(--primary), var(--secondary)); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; color: white; padding-bottom: 0; }
-        #page-landing.active { display: flex; }
-        .landing-logo { margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
-        .landing-title { font-size: 3.5rem; font-weight: 800; margin-bottom: 5px; letter-spacing: 2px; }
-        .landing-subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 40px; font-weight: 300; }
-        .landing-tip-card { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); padding: 20px; border-radius: 20px; margin-bottom: 40px; max-width: 100%; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .landing-tip-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 10px; }
-        .landing-tip-text { font-size: 1.1rem; font-style: italic; line-height: 1.5; }
-        .btn-start-app { background: white; color: var(--primary); font-size: 1.4rem; font-weight: 700; padding: 18px 60px; border-radius: 50px; border: none; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.2s, box-shadow 0.2s; display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
-        .btn-start-app:active { transform: scale(0.95); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-
-        .lang-toggle-container { display: flex; gap: 15px; margin-top: 10px; justify-content: center; }
-        .lang-mini-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; backdrop-filter: blur(4px); transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-        .lang-mini-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
-        .lang-mini-btn.active { background: white; color: var(--primary); font-weight: bold; border-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .side-menu .lang-toggle-container { margin-bottom: 5px; }
-        .side-menu .lang-mini-btn { color: var(--text-main); border-color: rgba(0,0,0,0.1); background: rgba(0,0,0,0.05); }
-        .side-menu .lang-mini-btn.active { background: var(--primary); color: white; }
-
-        .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .theme-btn { padding: 10px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; text-align: center; font-weight: 500; font-size: 0.9rem; color: white; transition: transform 0.1s; }
-        .theme-btn:active { transform: scale(0.95); }
-        .switch-container { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.05); padding: 10px 15px; border-radius: 10px; margin-bottom: 10px; }
-        .switch-label { font-weight: 500; }
-        .switch-toggle { position: relative; display: inline-block; width: 40px; height: 24px; }
-        .switch-toggle input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(16px); }
-
+        /* Header */
         header.app-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: calc(var(--safe-area-top) + 15px) 20px 30px 20px; border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; color: white; text-align: center; box-shadow: 0 10px 30px rgba(78, 84, 200, 0.4); margin-bottom: 20px; position: relative; transition: background 0.3s; }
         .menu-btn { position: fixed; top: 50px; right: 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; z-index: 1200; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; transition: transform 0.3s; }
         body.no-scroll { overflow: hidden; }
         .menu-btn:active { transform: scale(0.9); }
+
+        /* Dashboard Elements */
         .total-balance { font-size: 3rem; font-weight: 700; direction: ltr; margin: 5px 0 5px 0; text-shadow: 0 4px 10px rgba(0,0,0,0.15); }
         .left-to-spend { font-size: 0.9rem; opacity: 0.9; margin-bottom: 15px; direction: ltr; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; display: inline-block; }
         .month-selector { display: flex; justify-content: center; align-items: center; gap: 20px; font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 20px; }
@@ -166,10 +106,27 @@
         .h-input-box input::placeholder { color: rgba(255,255,255,0.6); }
         .motivation-box { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 10px 15px; margin-top: 10px; backdrop-filter: blur(4px); min-height: 40px; display: flex; align-items: center; justify-content: center; }
         .motivation-text { color: rgba(255,255,255,0.95); font-size: 1rem; font-style: italic; }
+
+        /* Search & Filter */
+        .search-container { padding: 0 15px 15px 15px; position: relative; }
+        .search-input { width: 100%; padding: 12px 40px 12px 15px; border-radius: 25px; border: none; background: rgba(0,0,0,0.05); color: var(--text-main); font-size: 1rem; }
+        .search-icon { position: absolute; top: 12px; left: 25px; color: var(--text-sec); }
         .filter-bar { display: flex; gap: 10px; padding: 0 15px; margin-bottom: 15px; justify-content: flex-end; }
         .filter-select { background: var(--card-bg); border: 1px solid rgba(0,0,0,0.1); padding: 8px; border-radius: 10px; font-size: 0.9rem; color: var(--text-main); }
-        #categories-container { max-width: 800px; margin: 0 auto; padding: 0 15px; display: flex; flex-direction: column; gap: 15px; }
-        .category-card { background: var(--card-bg); border-radius: 15px; box-shadow: var(--shadow); border: var(--glass-border); overflow: hidden; backdrop-filter: blur(10px); position: relative; }
+
+        /* Side Menu */
+        .side-menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .side-menu-overlay.open { opacity: 1; pointer-events: all; }
+        .side-menu { position: fixed; top: 0; right: -280px; bottom: 0; width: 280px; background: var(--card-bg); z-index: 1001; transition: 0.3s; padding: 100px 20px 20px 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 5px; overflow-y: auto; max-height: 100vh; }
+        .side-menu.open { right: 0; }
+        .side-menu::-webkit-scrollbar { width: 6px; }
+        .side-menu::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 3px; }
+        .menu-item { display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: 12px; color: var(--text-main); font-weight: 500; font-size: 1.05rem; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+        .menu-item:hover { background: rgba(0,0,0,0.05); }
+        .menu-item.active { background: var(--primary); color: white; }
+
+        /* Category Card */
+        .category-card { background: var(--card-bg); border-radius: 15px; box-shadow: var(--shadow); border: var(--glass-border); overflow: hidden; backdrop-filter: blur(10px); position: relative; margin-bottom: 15px; }
         .card-header { padding: 15px; padding-left: 45px; display: flex; justify-content: space-between; align-items: center; cursor: default; }
         .drag-handle { position: absolute; top: 40px; left: 10px; width: 24px; height: 24px; color: #b2bec3; display: flex; align-items: center; justify-content: center; cursor: grab; font-size: 1.2rem; z-index: 10; touch-action: none; }
         .cat-delete-main-btn { position: absolute; top: 10px; left: 10px; width: 24px; height: 24px; background: rgba(255, 118, 117, 0.15); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; z-index: 10; }
@@ -188,27 +145,115 @@
         .qa-row { display: flex; gap: 10px; }
         .qa-input { padding: 12px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); background: var(--card-bg); color: var(--text-main); font-size: 1rem; flex: 1; min-width: 0; }
         .qa-btn { background: var(--text-main); color: var(--bg-color); border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1rem; display: flex; justify-content: center; align-items: center; gap: 5px; }
+
+        /* Recurrring & Tools */
+        .recur-add-box { background: var(--card-bg); padding: 20px; margin: 15px; border-radius: 15px; box-shadow: var(--shadow); }
+        .rec-type-selector { display: flex; gap: 15px; margin-bottom: 15px; justify-content: center; background: rgba(0,0,0,0.03); padding: 10px; border-radius: 10px; }
+        .rec-type-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; font-size: 0.95rem; }
+        .rec-type-label input { accent-color: var(--primary); transform: scale(1.2); }
+        
+        .converter-box { background: var(--card-bg); border-radius: 20px; padding: 25px; margin: 20px; box-shadow: var(--shadow); border: var(--glass-border); text-align: center; display: flex; flex-direction: column; gap: 15px; }
+        .conv-label { text-align: start; font-size: 0.9rem; color: var(--text-sec); margin-bottom: 5px; font-weight: 500; }
+        .conv-input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: rgba(0,0,0,0.02); font-size: 1.5rem; color: var(--text-main); font-weight: bold; text-align: center; outline: none; }
+        .conv-select { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: var(--bg-color); font-size: 1rem; color: var(--text-main); appearance: none; }
+        .conv-swap-container { display: flex; justify-content: center; align-items: center; margin: -5px 0; z-index: 5; }
+        .conv-swap-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--primary); color: white; border: 2px solid var(--card-bg); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 1.2rem; transition: transform 0.2s; }
+        .conv-swap-btn:active { transform: scale(0.9); }
+        .conv-result { margin-top: 10px; padding: 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-radius: 15px; }
+        .conv-res-big { font-size: 2.2rem; font-weight: bold; direction: ltr; }
+        .conv-res-sub { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; direction: ltr; }
+
+        .tool-card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin: 15px; box-shadow: var(--shadow); border: var(--glass-border); }
+        .tool-row { margin-bottom: 15px; }
+        .tool-label { display: block; margin-bottom: 5px; color: var(--text-sec); font-size: 0.9rem; }
+        .tool-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); background: var(--bg-color); color: var(--text-main); font-size: 1.1rem; }
+        .tool-result { margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.03); border-radius: 10px; text-align: center; }
+        .tool-res-val { font-size: 1.8rem; font-weight: bold; color: var(--primary); margin-top: 5px; direction: ltr; }
+        
+        .wishlist-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card-bg); margin-bottom: 10px; border-radius: 12px; box-shadow: var(--shadow); border: var(--glass-border); }
+        .w-info { flex: 1; }
+        .w-name { font-weight: bold; font-size: 1.1rem; }
+        .w-price { color: var(--text-sec); font-size: 0.9rem; margin-top: 3px; }
+        .w-actions { display: flex; gap: 10px; }
+        .w-btn { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; color: white; transition: transform 0.1s; }
+        .w-btn:active { transform: scale(0.9); }
+        .w-btn.buy { background: var(--success); }
+        .w-btn.del { background: var(--danger); opacity: 0.8; }
+
         .savings-container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
         .saving-card { color: white; border-radius: 15px; padding: 15px; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; }
         .saving-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .saving-progress-bg { background: rgba(255,255,255,0.3); height: 8px; border-radius: 4px; overflow: hidden; }
         .saving-progress-fill { background: white; height: 100%; width: 0%; transition: 0.5s; }
-        .color-opt { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.2s; }
-        .color-opt.selected { border-color: #333; transform: scale(1.1); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        
         .chart-container-card { max-width: 800px; margin: 20px auto; padding: 0 15px; }
         .chart-wrapper { background: var(--card-bg); border-radius: 15px; box-shadow: var(--shadow); border: var(--glass-border); padding: 15px; height: 320px; position: relative; }
         .chart-toggle { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.05); border: none; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; z-index: 10; }
-        .recur-add-box { background: var(--card-bg); padding: 20px; margin: 15px; border-radius: 15px; box-shadow: var(--shadow); }
+
         .btn-primary { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; transition: transform 0.1s; }
         .btn-primary:active { transform: scale(0.98); }
         .ad-spacer { height: 60px; width: 100%; display: block; }
         .fab { position: fixed; bottom: 20px; left: 20px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(78, 84, 200, 0.5); cursor: pointer; border: none; z-index: 95; transition: transform 0.2s; }
         .fab:active { transform: scale(0.9); }
+
+        /* Lock Screen */
+        #pin-lock-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-color); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+        #pin-lock-screen.active { display: flex; }
+        .pin-cancel-btn { position: absolute; top: 40px; right: 20px; background: transparent; border: none; font-size: 1.5rem; color: var(--text-sec); cursor: pointer; padding: 10px; display: none; }
+        .pin-title { margin-bottom: 20px; font-size: 1.5rem; color: var(--text-main); font-weight: bold; }
+        .pin-subtitle { margin-bottom: 30px; color: var(--text-sec); font-size: 1rem; min-height: 20px; }
+        .pin-dots { display: flex; gap: 15px; margin-bottom: 40px; }
+        .pin-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--primary); transition: 0.2s; }
+        .pin-dot.filled { background: var(--primary); }
+        .pin-dot.error { border-color: var(--danger); background: var(--danger); animation: shake 0.3s; }
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 300px; width: 100%; }
+        .num-btn { background: var(--card-bg); border: var(--glass-border); color: var(--text-main); font-size: 1.5rem; font-weight: 500; height: 70px; border-radius: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow); transition: 0.1s; }
+        .num-btn:active { transform: scale(0.95); background: rgba(0,0,0,0.05); }
+        .num-btn.dummy { visibility: hidden; pointer-events: none; }
+        
+        /* Landing */
+        #page-landing { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, var(--primary), var(--secondary)); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; color: white; padding-bottom: 0; }
+        #page-landing.active { display: flex; }
+        .landing-logo { margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+        .landing-title { font-size: 3.5rem; font-weight: 800; margin-bottom: 5px; letter-spacing: 2px; }
+        .landing-subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 40px; font-weight: 300; }
+        .landing-tip-card { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); padding: 20px; border-radius: 20px; margin-bottom: 40px; max-width: 100%; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .landing-tip-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 10px; }
+        .landing-tip-text { font-size: 1.1rem; font-style: italic; line-height: 1.5; }
+        .btn-start-app { background: white; color: var(--primary); font-size: 1.4rem; font-weight: 700; padding: 18px 60px; border-radius: 50px; border: none; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.2s, box-shadow 0.2s; display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
+        .btn-start-app:active { transform: scale(0.95); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        /* Switches & Settings */
+        .lang-toggle-container { display: flex; gap: 15px; margin-top: 10px; justify-content: center; }
+        .lang-mini-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; backdrop-filter: blur(4px); transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .lang-mini-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+        .lang-mini-btn.active { background: white; color: var(--primary); font-weight: bold; border-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .side-menu .lang-toggle-container { margin-bottom: 5px; }
+        .side-menu .lang-mini-btn { color: var(--text-main); border-color: rgba(0,0,0,0.1); background: rgba(0,0,0,0.05); }
+        .side-menu .lang-mini-btn.active { background: var(--primary); color: white; }
+        
+        .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .theme-btn { padding: 10px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; text-align: center; font-weight: 500; font-size: 0.9rem; color: white; transition: transform 0.1s; }
+        .theme-btn:active { transform: scale(0.95); }
+        
+        .switch-container { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.05); padding: 10px 15px; border-radius: 10px; margin-bottom: 10px; }
+        .switch-label { font-weight: 500; }
+        .switch-toggle { position: relative; display: inline-block; width: 40px; height: 24px; }
+        .switch-toggle input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(16px); }
+        
+        .color-opt { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.2s; }
+        .color-opt.selected { border-color: #333; transform: scale(1.1); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        
+        /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; justify-content: center; align-items: center; padding: 20px; opacity: 0; pointer-events: none; transition: 0.3s; }
         .modal-overlay.open { opacity: 1; pointer-events: all; }
         .modal-card { background: var(--bg-color); width: 100%; max-width: 400px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; }
-        .emoji-grid { display: flex; gap: 5px; justify-content: center; margin-bottom: 10px; }
-        .emoji-opt { font-size: 1.5rem; cursor: pointer; padding: 5px; border-radius: 5px; }
+
+        /* SSC */
         .ssc-wrap { padding: 15px; font-family:"Rubik", sans-serif; color: var(--text-main); }
         .ssc-header-container { text-align: center; margin-top: 40px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .ssc-glass-badge { background: rgba(255,255,255,0.2); color: #fff; padding: 6px 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; font-size: 0.9rem; font-weight: 500; backdrop-filter: blur(5px); }
@@ -233,6 +278,7 @@
         .ssc-btn-close-slice { width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 1px solid #eee; color: var(--danger); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 2px; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
     </style>
 </head>
 <body>
@@ -337,7 +383,7 @@
             <div class="motivation-box"><i class="fas fa-quote-right" style="margin-left:5px; opacity:0.8"></i><span class="motivation-text" id="motivation-text">...</span></div>
         </header>
 
-        <div style="position:relative; margin: -15px 15px 15px 15px;">
+        <div class="search-container">
             <i class="fas fa-search search-icon"></i>
             <input type="text" id="search-bar" class="search-input" data-lang-placeholder="search_ph" placeholder="חיפוש..." oninput="renderApp()">
         </div>
@@ -564,6 +610,14 @@
                 <div class="theme-btn" style="background:#f77f00" onclick="applyTheme('sunset')">שקיעה</div>
             </div>
 
+            <div style="margin-top:15px; margin-bottom:5px; font-weight:bold; font-size:0.9rem; color:var(--text-sec);">תאריך תחילת חודש (מחזור חיוב)</div>
+            <div class="switch-container" style="flex-direction:column; align-items:stretch; gap:10px;">
+                <div style="display:flex; justify-content:space-between;">
+                     <span>יום בחודש: <span id="bill-day-val" style="font-weight:bold; color:var(--primary);">1</span></span>
+                </div>
+                <input type="range" id="billing-day-slider" min="1" max="31" value="1" style="width:100%" oninput="updateBillingDayVal()" onchange="saveBillingDay()">
+            </div>
+
             <div class="switch-container">
                 <span class="switch-label">רטט במגע</span>
                 <label class="switch-toggle">
@@ -716,7 +770,8 @@
             <div style="display:flex; gap:10px;"><button class="btn-primary" style="background:#ccc; color:#333" onclick="document.getElementById('buy-item-modal').classList.remove('open')" data-lang="cancel">ביטול</button><button class="btn-primary" onclick="confirmBuyItem()" data-lang="confirm">בצע רכישה</button></div>
         </div>
     </div>
-<script>
+
+    <script>
         /* =========================================
            1. GLOBAL VARIABLES & CONFIG
            ========================================= */
@@ -747,7 +802,7 @@
             lastProcessedMonth: "", 
             lastLogin: Date.now(), 
             isPremium: false,
-            settings: { theme: 'default', haptics: true }
+            settings: { theme: 'default', haptics: true, billingDay: 1 }
         };
 
         // Load from Storage safely
@@ -758,7 +813,7 @@
                 // Ensure arrays exist
                 if (!appData.recurringSettings) appData.recurringSettings = [];
                 if (!appData.wishlist) appData.wishlist = [];
-                if (!appData.settings) appData.settings = { theme: 'default', haptics: true };
+                if (!appData.settings) appData.settings = { theme: 'default', haptics: true, billingDay: 1 };
                 
                 // Fix recurring types for old data
                 appData.recurringSettings.forEach(rec => {
@@ -774,7 +829,7 @@
             he: {
                 dir: 'rtl', locale: 'he-IL', remove_pin: "הסר קוד נעילה",
                 app_title: "Neto", subtitle: "ניהול תקציב חכם ופשוט", daily_tip: "טיפ יומי", start_btn: "בואו נתחיל",
-                menu_title: "תפריט", menu_home: "ראשי", menu_converter: "ממיר מטבעות", menu_recur: "הוצאות קבועות", menu_calc: "מחשבון שכר", menu_loan: "מחשבון הלוואה", menu_split: "פיצול חשבון", menu_wishlist: "רשימת משאלות", menu_pro: "פרימיום", menu_backup: "הגדרות", menu_dark: "מצב לילה", setup_pin: "הגדרת קוד נעילה",
+                menu_title: "תפריט", menu_home: "ראשי", menu_converter: "ממיר מטבעות", menu_recur: "הוצאות קבועות", menu_calc: "מחשבון שכר", menu_loan: "מחשבון הלוואה", menu_split: "פיצול חשבון", menu_wishlist: "רשימת משאלות", menu_pro: "פרימיום", menu_backup: "גיבוי ושחזור", menu_dark: "מצב לילה", setup_pin: "הגדרת קוד נעילה",
                 balance_label: "עו\"ש בבנק", salary_label: "משכורת", filter_all: "כל הקטגוריות", search_ph: "חיפוש הוצאות...", left_to_spend: "נותר לבזבוז:",
                 savings_title: "קופות חיסכון", new_goal_btn: "+ יעד חדש", chart_toggle: "החלף תצוגה",
                 budget: "תקציב:", add: "הוסף", desc_placeholder: "תיאור", amount_placeholder: "סכום",
@@ -847,9 +902,7 @@
             USD: { he: "דולר אמריקאי", en: "US Dollar" }, EUR: { he: "אירו", en: "Euro" }, ILS: { he: "שקל חדש", en: "Israeli Shekel" }, GBP: { he: "לירה שטרלינג", en: "British Pound" }, JPY: { he: "יין יפני", en: "Japanese Yen" }, AUD: { he: "דולר אוסטרלי", en: "Australian Dollar" }, CAD: { he: "דולר קנדי", en: "Canadian Dollar" }, CHF: { he: "פרנק שוויצרי", en: "Swiss Franc" }, CNY: { he: "יואן סיני", en: "Chinese Yuan" }, RUB: { he: "רובל רוסי", en: "Russian Ruble" }, BRL: { he: "ריאל ברזילאי", en: "Brazilian Real" }, INR: { he: "רופי הודי", en: "Indian Rupee" }, TRY: { he: "לירה טורקית", en: "Turkish Lira" }, ZAR: { he: "ראנד דרום אפריקאי", en: "South African Rand" }, EGP: { he: "לירה מצרית", en: "Egyptian Pound" }, JOD: { he: "דינר ירדני", en: "Jordanian Dinar" }
         };
 
-        /* =========================================
-           3. HELPER FUNCTIONS (Defined before usage)
-           ========================================= */
+        // === 3. CORE FUNCTIONS (Safe) ===
         function t(key) { 
             if (!translations[currentLang]) currentLang = 'he';
             return translations[currentLang][key] || key; 
@@ -860,165 +913,35 @@
             if(translations[currentLang]) loc = translations[currentLang].locale;
             return n.toLocaleString(loc, { style: 'currency', currency: currentCurrency, maximumFractionDigits: 0 }); 
         }
-
+function checkPinLock() {
+            // טעינת הקוד מהזיכרון
+            pinCode = localStorage.getItem('appPin');
+            
+            // בדיקה האם יש קוד מוגדר
+            if (pinCode) {
+                // הצגת מסך הנעילה
+                const lockScreen = document.getElementById('pin-lock-screen');
+                if (lockScreen) lockScreen.classList.add('active');
+                
+                // עדכון הכותרת ל"הזן קוד"
+                const title = document.getElementById('pin-title');
+                if (title) title.innerText = t('pin_enter');
+                
+                // הסתרת כפתור הביטול (כי בכניסה חייבים להקיש קוד)
+                const cancelBtn = document.getElementById('pin-cancel-btn');
+                if (cancelBtn) cancelBtn.style.display = 'none';
+                
+                // איפוס הקלט
+                pinInput = "";
+                if (typeof updatePinDots === 'function') updatePinDots();
+                
+                return true; // מחזיר 'אמת' - האפליקציה נעולה
+            }
+            return false; // מחזיר 'שקר' - האפליקציה פתוחה
+        }
         function triggerHaptic() { if(appData.settings.haptics && navigator.vibrate) navigator.vibrate(10); }
         
         function saveData() { localStorage.setItem('budgetUltimateDataV23', JSON.stringify(appData)); }
-
-        /* =========================================
-           4. DOM ELEMENTS LOGIC (Views & UI)
-           ========================================= */
-        function toggleMenu() {
-            const menu = document.getElementById('side-menu');
-            const overlay = document.getElementById('menu-overlay');
-            if(menu) menu.classList.toggle('open');
-            if(overlay) overlay.classList.toggle('open');
-            document.body.classList.toggle('no-scroll');
-        }
-
-        function navTo(pageName) {
-            triggerHaptic();
-            if(document.getElementById('side-menu').classList.contains('open')) toggleMenu();
-            if (pageName === 'dashboard') document.getElementById('page-landing').classList.remove('active');
-
-            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`page-${pageName}`).classList.add('active');
-            
-            // Run page specific logic
-            if(pageName === 'dashboard') renderApp();
-            if(pageName === 'recurring') renderRecurringPage();
-            if(pageName === 'wishlist') renderWishlist();
-        }
-
-        /* =========================================
-           5. FEATURE LOGIC (Wishlist, Converter, etc)
-           ========================================= */
-        // --- Wishlist Logic (Fixed Definition) ---
-        function renderWishlist() {
-            const container = document.getElementById('wishlist-container');
-            if(!container) return;
-            container.innerHTML = '';
-            
-            if(!appData.wishlist || appData.wishlist.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:20px; opacity:0.6;">${t('no_items')}</div>`;
-                return;
-            }
-            
-            appData.wishlist.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'wishlist-item animate-item';
-                div.innerHTML = `
-                    <div class="w-info">
-                        <div class="w-name">${item.name}</div>
-                        <div class="w-price">${formatMoney(item.price)}</div>
-                    </div>
-                    <div class="w-actions">
-                        <button class="w-btn buy" onclick="openBuyItemModal(${index})"><i class="fas fa-check"></i></button>
-                        <button class="w-btn del" onclick="deleteWishlistItem(${index})"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function addWishlistItem() {
-            triggerHaptic();
-            const name = document.getElementById('wish-name').value;
-            const price = parseFloat(document.getElementById('wish-price').value);
-            if(name && price) {
-                appData.wishlist.push({name, price});
-                saveData();
-                renderWishlist();
-                document.getElementById('wish-name').value = '';
-                document.getElementById('wish-price').value = '';
-            }
-        }
-
-        function deleteWishlistItem(index) {
-            triggerHaptic();
-            appData.wishlist.splice(index, 1);
-            saveData();
-            renderWishlist();
-        }
-
-        function openBuyItemModal(index) {
-            document.getElementById('buy-item-index').value = index;
-            const select = document.getElementById('buy-cat-select');
-            select.innerHTML = appData.categories.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
-            document.getElementById('buy-item-modal').classList.add('open');
-        }
-
-        function confirmBuyItem() {
-            triggerHaptic();
-            const index = parseInt(document.getElementById('buy-item-index').value);
-            const catId = document.getElementById('buy-cat-select').value;
-            const item = appData.wishlist[index];
-            const cat = appData.categories.find(c => c.id == catId);
-            if(cat && item) {
-                cat.items.push({ id: Date.now().toString(), text: item.name, amount: -Math.abs(item.price), date: currentDate.toISOString(), method: 'credit' });
-                appData.wishlist.splice(index, 1);
-                saveAndRender();
-                renderWishlist();
-                document.getElementById('buy-item-modal').classList.remove('open');
-                showAppAlert(t('alert_title'), 'Purchased!', '🛍️');
-            }
-        }
-
-        // --- Converter Logic ---
-        function initConverter() {
-            fetch('https://api.exchangerate-api.com/v4/latest/USD')
-                .then(res => res.json())
-                .then(data => {
-                    ratesData = data.rates;
-                    const apiKeys = Object.keys(ratesData);
-                    const sel1 = document.getElementById('conv-from');
-                    const sel2 = document.getElementById('conv-to');
-                    if(!sel1 || !sel2) return;
-                    
-                    const old1 = sel1.value; const old2 = sel2.value;
-                    sel1.innerHTML = ''; sel2.innerHTML = '';
-                    
-                    const popularList = Object.keys(currencyNames).filter(code => apiKeys.includes(code));
-                    const otherList = apiKeys.filter(code => !currencyNames[code]).sort();
-                    const sortedList = [...popularList, ...otherList];
-
-                    sortedList.forEach(cur => {
-                        const label = currencyNames[cur] ? `${cur} - ${currencyNames[cur][currentLang]}` : cur;
-                        const opt1 = document.createElement('option'); opt1.value = cur; opt1.text = label;
-                        const opt2 = document.createElement('option'); opt2.value = cur; opt2.text = label;
-                        if (currencyNames[cur]) { 
-                            opt1.style.fontWeight = "bold"; opt1.style.color = "var(--primary)"; 
-                            opt2.style.fontWeight = "bold"; opt2.style.color = "var(--primary)"; 
-                        }
-                        sel1.appendChild(opt1); sel2.appendChild(opt2);
-                    });
-                    sel1.value = old1 || 'USD';
-                    sel2.value = old2 || 'ILS';
-                    convertCurrency();
-                })
-                .catch(err => { console.log("Converter Offline"); });
-        }
-
-        function convertCurrency() {
-            if(!ratesData || Object.keys(ratesData).length === 0) return;
-            const amount = parseFloat(document.getElementById('conv-amount').value) || 0;
-            const from = document.getElementById('conv-from').value;
-            const to = document.getElementById('conv-to').value;
-            const rateFrom = ratesData[from];
-            const rateTo = ratesData[to];
-            const res = (amount / rateFrom) * rateTo;
-            document.getElementById('conv-result-big').innerText = res.toFixed(2) + ' ' + to;
-            document.getElementById('conv-result-sub').innerText = `1 ${from} = ${(rateTo/rateFrom).toFixed(4)} ${to}`;
-        }
-
-        function swapCurrencies() {
-            triggerHaptic();
-            const s1 = document.getElementById('conv-from');
-            const s2 = document.getElementById('conv-to');
-            const tmp = s1.value; s1.value = s2.value; s2.value = tmp;
-            convertCurrency();
-        }
 
         // --- Settings Logic ---
         function applyTheme(themeName) {
@@ -1034,18 +957,160 @@
             if(appData.settings.haptics) triggerHaptic();
         }
 
-        function setCurrency(code) {
-            triggerHaptic();
-            currentCurrency = code;
-            localStorage.setItem('appCurrency', code);
-            document.querySelectorAll('[data-curr-btn]').forEach(btn => {
-                btn.classList.remove('active');
-                if(btn.dataset.currBtn === code) btn.classList.add('active');
-            });
-            refreshAll();
+        function updateBillingDayVal() {
+            const val = document.getElementById('billing-day-slider').value;
+            document.getElementById('bill-day-val').innerText = val;
         }
 
-        function setLanguage(lang) {
+        function saveBillingDay() {
+            const val = document.getElementById('billing-day-slider').value;
+            appData.settings.billingDay = parseInt(val);
+            saveData();
+            renderApp();
+        }
+
+        // --- Main Render Logic (With Date Cycle) ---
+        function renderApp() {
+            const startDay = parseInt(appData.settings.billingDay) || 1;
+            const key = getMonthKey(currentDate); // Using current visual month
+            
+            document.getElementById('salary-input').value = (appData.monthlySalaries && appData.monthlySalaries[key]) ? appData.monthlySalaries[key] : '';
+            
+            const filterCat = document.getElementById('cat-filter'); const currentFilter = filterCat.value;
+            filterCat.innerHTML = `<option value="all">${t('filter_all')}</option>` + appData.categories.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
+            filterCat.value = currentFilter;
+
+            const container = document.getElementById('categories-container'); container.innerHTML = '';
+            let totalExpenses = 0;
+            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+
+            appData.categories.forEach(cat => {
+                if(currentFilter !== 'all' && cat.id != currentFilter) return;
+                
+                // Advanced Cycle Filtering
+                let filteredItems = cat.items.filter(item => {
+                    const d = new Date(item.date);
+                    // Determine cycle month of item
+                    let cycleMonth = d.getMonth();
+                    let cycleYear = d.getFullYear();
+                    
+                    if (startDay > 1 && d.getDate() >= startDay) {
+                        cycleMonth++;
+                        if (cycleMonth > 11) { cycleMonth = 0; cycleYear++; }
+                    }
+                    
+                    return cycleMonth === currentDate.getMonth() && cycleYear === currentDate.getFullYear();
+                });
+
+                if(searchTerm) {
+                    filteredItems = filteredItems.filter(item => item.text.toLowerCase().includes(searchTerm));
+                }
+
+                const catTotal = filteredItems.reduce((sum, item) => sum + item.amount, 0); 
+                if(!searchTerm) totalExpenses += catTotal;
+
+                if(searchTerm && filteredItems.length === 0) return;
+
+                const spentPos = Math.abs(Math.min(0, catTotal)); const limit = cat.limit || 1000; const percent = Math.min(100, (spentPos / limit) * 100);
+                let colorClass = percent > 100 ? 'bg-red' : (percent > 75 ? 'bg-yellow' : 'bg-green'); let balanceStyle = percent >= 100 ? 'color:var(--danger)' : '';
+
+                const card = document.createElement('div'); card.className = 'category-card animate-item'; card.setAttribute('data-id', cat.id); 
+                const deleteBtnHtml = `<div class="cat-delete-main-btn" onclick="deleteCategoryMain(${cat.id})"><i class="fas fa-times"></i></div>`;
+                const dragHandleHtml = `<div class="drag-handle"><i class="fas fa-sort"></i></div>`;
+
+                card.innerHTML = `
+                    ${deleteBtnHtml} ${dragHandleHtml}
+                    <div class="card-header">
+                        <div class="cat-info"><div class="cat-emoji">${cat.emoji}</div><div><div style="font-weight:bold">${cat.name}</div><div class="cat-limit" onclick="openLimitModal(${cat.id})">${t('budget')} ${limit} <i class="fas fa-pen" style="font-size:0.7rem"></i></div></div></div>
+                        <div class="current-spend" style="${balanceStyle}">${formatMoney(catTotal)}</div>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill ${colorClass}" style="width:${percent}%"></div></div>
+                    <ul class="items-list">
+                        ${filteredItems.map(item => {
+                            let icon = item.method === 'cash' ? '<i class="fas fa-money-bill-wave pay-method-icon"></i>' : (item.method === 'transfer' ? '<i class="fas fa-university pay-method-icon"></i>' : '<i class="fas fa-credit-card pay-method-icon"></i>');
+                            let dObj = new Date(item.date);
+                            let dateStr = dObj.getDate() + '/' + (dObj.getMonth()+1);
+                            
+                            return `<li class="item-row">
+                                <span style="display:flex;flex-direction:column;">
+                                    <span>${item.text} ${item.isAuto ? '<i class="fas fa-robot"></i>' : ''}</span>
+                                    <span style="font-size:0.7rem; opacity:0.6;">${dateStr}</span>
+                                </span>
+                                <div>${icon}
+                                    <span class="${item.amount < 0 ? 'amount-neg' : 'amount-pos'}">${formatMoney(Math.abs(item.amount))}</span>
+                                    <i class="fas fa-copy" onclick="duplicateItem(${cat.id}, '${item.id}')" style="margin:0 5px; color:#aaa; cursor:pointer;"></i>
+                                    <i class="fas fa-times" onclick="deleteItem(${cat.id}, '${item.id}')" style="margin-right:5px; color:#ccc; cursor:pointer;"></i>
+                                </div>
+                            </li>`
+                        }).join('')}
+                    </ul>
+                    <div class="quick-add">
+                        <div class="qa-row"><input id="d-${cat.id}" class="qa-input" placeholder="${t('desc_placeholder')}"></div>
+                        <div class="qa-row"><input id="a-${cat.id}" type="number" class="qa-input" placeholder="${t('amount_placeholder')}"><select id="m-${cat.id}" class="qa-input" style="flex:0.5"><option value="credit">💳</option><option value="cash">💵</option><option value="transfer">🏦</option></select></div>
+                        <button class="qa-btn" onclick="addItem(${cat.id})"><i class="fas fa-plus"></i> ${t('add')}</button>
+                    </div>`;
+                container.appendChild(card);
+            });
+
+            if(categorySortable) categorySortable.destroy();
+            categorySortable = new Sortable(container, { animation: 150, handle: '.drag-handle', onEnd: function (evt) { const item = appData.categories.splice(evt.oldIndex, 1)[0]; appData.categories.splice(evt.newIndex, 0, item); saveData(); } });
+
+            if(!searchTerm) {
+                const bank = parseFloat(appData.bank) || 0; 
+                const salary = parseFloat(appData.monthlySalaries?.[key]) || 0; 
+                const total = bank + salary + totalExpenses;
+                
+                const totalSaved = appData.goals.reduce((acc, g) => acc + g.current, 0);
+                const leftToSpend = total - totalSaved;
+
+                document.getElementById('global-balance').innerText = formatMoney(total); 
+                document.getElementById('global-balance').style.color = total < 0 ? 'var(--danger)' : 'white';
+                
+                document.getElementById('left-to-spend').innerText = t('left_to_spend') + ' ' + formatMoney(leftToSpend);
+
+                renderHistoryChart();
+            }
+            renderSavings();
+        }
+
+        // === 4. STARTUP ===
+        document.addEventListener('DOMContentLoaded', () => {
+            if(isDarkMode) document.body.classList.add('dark-mode');
+            
+            // Critical First Steps
+            checkPinLock();
+            
+            // Init UI settings
+            const haptToggle = document.getElementById('haptic-toggle');
+            if(haptToggle) haptToggle.checked = appData.settings.haptics;
+            applyTheme(appData.settings.theme || 'default');
+            
+            const billSlider = document.getElementById('billing-day-slider');
+            const savedBillDay = appData.settings.billingDay || 1;
+            billSlider.value = savedBillDay;
+            document.getElementById('bill-day-val').innerText = savedBillDay;
+
+            // Load Content
+            setLanguage(currentLang);
+            setCurrency(currentCurrency);
+            document.getElementById('bank-input').value = appData.bank || '';
+
+            checkAndRunRecurring();
+            updateMonthDisplay();
+            renderApp();
+            checkPremiumStatus();
+            
+            // Load Heavy Modules
+            if(typeof initSalaryCalculator === 'function') initSalaryCalculator();
+            if(typeof initConverter === 'function') initConverter();
+            if(typeof renderWishlist === 'function') renderWishlist();
+            
+            appData.lastLogin = Date.now();
+            saveData();
+        });
+
+        // === REST OF FUNCTIONS ===
+function setLanguage(lang) {
             triggerHaptic();
             currentLang = lang;
             localStorage.setItem('appLang', lang);
@@ -1059,8 +1124,15 @@
             updateTip();
             refreshAll();
         }
-
-        function refreshAll() {
+function updateTip() {
+            const tips = translations[currentLang].tips;
+            const randTip = tips[Math.floor(Math.random() * tips.length)];
+            const tipEl = document.getElementById('landing-tip-text');
+            const motEl = document.getElementById('motivation-text');
+            if(tipEl) tipEl.innerText = randTip;
+            if(motEl) motEl.innerText = randTip;
+        }
+function refreshAll() {
             if(typeof updateMonthDisplay === 'function') updateMonthDisplay();
             if(typeof renderApp === "function") renderApp();
             if(typeof renderRecurringPage === "function") renderRecurringPage();
@@ -1069,143 +1141,23 @@
             if(document.getElementById('ssc_grid') && typeof initSalaryCalculator === "function") initSalaryCalculator();
             if(typeof renderWishlist === "function") renderWishlist();
         }
-
-        function updateTip() {
-            const tips = translations[currentLang].tips;
-            const randTip = tips[Math.floor(Math.random() * tips.length)];
-            const tipEl = document.getElementById('landing-tip-text');
-            const motEl = document.getElementById('motivation-text');
-            if(tipEl) tipEl.innerText = randTip;
-            if(motEl) motEl.innerText = randTip;
+function setCurrency(code) {
+            triggerHaptic();
+            currentCurrency = code;
+            localStorage.setItem('appCurrency', code);
+            document.querySelectorAll('[data-curr-btn]').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.dataset.currBtn === code) btn.classList.add('active');
+            });
+            refreshAll();
         }
 
-        /* =========================================
-           6. MAIN STARTUP
-           ========================================= */
-        document.addEventListener('DOMContentLoaded', () => {
-            try {
-                if(isDarkMode) document.body.classList.add('dark-mode');
-                
-                // Lock Check
-                checkPinLock();
 
-                // Init UI
-                const haptToggle = document.getElementById('haptic-toggle');
-                if(haptToggle) haptToggle.checked = appData.settings.haptics;
-                applyTheme(appData.settings.theme || 'default');
-                document.getElementById('bank-input').value = appData.bank || '';
-
-                // Init Lang & Currency
-                setLanguage(currentLang);
-                setCurrency(currentCurrency);
-
-                // Run App Logic
-                checkAndRunRecurring();
-                updateMonthDisplay();
-                renderApp();
-                checkPremiumStatus();
-                initSalaryCalculator();
-                initConverter();
-                renderWishlist();
-                
-                appData.lastLogin = Date.now();
-                saveData();
-            } catch(e) {
-                console.error("Startup Error:", e);
-            }
-        });
-
-        /* =========================================
-           7. REMAINING APP LOGIC
-           ========================================= */
-        function checkPinLock() {
-            pinCode = localStorage.getItem('appPin');
-            if(pinCode) {
-                document.getElementById('pin-lock-screen').classList.add('active');
-                document.getElementById('pin-title').innerText = t('pin_enter');
-                document.getElementById('pin-cancel-btn').style.display = 'none';
-                pinInput = "";
-                updatePinDots();
-                return true; 
-            }
-            return false;
-        }
-        function setupPinCode() { toggleMenu(); pinSetupMode = true; tempPin = ""; pinInput = ""; document.getElementById('pin-lock-screen').classList.add('active'); document.getElementById('pin-title').innerText = t('pin_setup'); document.getElementById('pin-cancel-btn').style.display = 'block'; updatePinDots(); }
-        function removePinCode() { if (!localStorage.getItem('appPin')) { showAppAlert(t('alert_title'), 'לא מוגדר קוד נעילה', '⚠️'); toggleMenu(); return; } showConfirmDialog("הסרת נעילה", "האם אתה בטוח שברצונך להסיר את קוד הנעילה?", function() { localStorage.removeItem('appPin'); pinCode = null; toggleMenu(); showAppAlert(t('alert_title'), 'קוד הנעילה הוסר בהצלחה', '🔓'); }); }
-        function cancelPinSetup() { pinSetupMode = false; tempPin = ""; pinInput = ""; document.getElementById('pin-lock-screen').classList.remove('active'); }
-        function pressPin(num) { triggerHaptic(); if(pinInput.length < 4) { pinInput += num; updatePinDots(); if(pinInput.length === 4) setTimeout(handlePinSubmit, 200); } }
-        function deletePin() { triggerHaptic(); pinInput = pinInput.slice(0, -1); updatePinDots(); }
-        function updatePinDots() { const dots = document.querySelectorAll('.pin-dot'); dots.forEach((dot, i) => { if(i < pinInput.length) dot.classList.add('filled'); else dot.classList.remove('filled'); dot.classList.remove('error'); }); }
-        function handlePinSubmit() { if(pinSetupMode) { if(!tempPin) { tempPin = pinInput; pinInput = ""; document.getElementById('pin-title').innerText = t('pin_confirm'); updatePinDots(); } else { if(pinInput === tempPin) { pinCode = pinInput; localStorage.setItem('appPin', pinCode); pinSetupMode = false; document.getElementById('pin-lock-screen').classList.remove('active'); showAppAlert(t('alert_title'), 'PIN Set Successfully!', '🔒'); } else { shakeDots(); document.getElementById('pin-subtitle').innerText = t('pin_match_err'); pinInput = ""; tempPin = ""; setTimeout(() => { document.getElementById('pin-title').innerText = t('pin_setup'); document.getElementById('pin-subtitle').innerText = ""; }, 1000); } } } else { if(pinInput === pinCode) { document.getElementById('pin-lock-screen').classList.remove('active'); } else { shakeDots(); document.getElementById('pin-subtitle').innerText = t('pin_wrong'); pinInput = ""; updatePinDots(); } } }
-        function shakeDots() { if(appData.settings.haptics && navigator.vibrate) navigator.vibrate([50,50,50]); const dots = document.querySelectorAll('.pin-dot'); dots.forEach(dot => dot.classList.add('error')); setTimeout(updatePinDots, 500); }
-
+        function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); document.getElementById('menu-overlay').classList.toggle('open'); document.body.classList.toggle('no-scroll'); }
+        function navTo(pageName) { triggerHaptic(); if(document.getElementById('side-menu').classList.contains('open')) toggleMenu(); if (pageName === 'dashboard') document.getElementById('page-landing').classList.remove('active'); document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active')); document.getElementById(`page-${pageName}`).classList.add('active'); if(pageName === 'dashboard') renderApp(); if(pageName === 'recurring') renderRecurringPage(); if(pageName === 'wishlist') renderWishlist(); }
         function getMonthKey(date) { return `${date.getMonth()}-${date.getFullYear()}`; }
         function updateSalary() { const val = document.getElementById('salary-input').value; const key = getMonthKey(currentDate); if (!appData.monthlySalaries) appData.monthlySalaries = {}; appData.monthlySalaries[key] = val; saveAndRender(); }
         function saveAndRender() { appData.bank = document.getElementById('bank-input').value; saveData(); renderApp(); }
-
-        function renderApp() {
-            const key = getMonthKey(currentDate);
-            document.getElementById('salary-input').value = (appData.monthlySalaries && appData.monthlySalaries[key]) ? appData.monthlySalaries[key] : '';
-            
-            const filterCat = document.getElementById('cat-filter'); const currentFilter = filterCat.value;
-            filterCat.innerHTML = `<option value="all">${t('filter_all')}</option>` + appData.categories.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
-            filterCat.value = currentFilter;
-
-            const container = document.getElementById('categories-container'); container.innerHTML = '';
-            let totalExpenses = 0;
-            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
-
-            appData.categories.forEach(cat => {
-                if(currentFilter !== 'all' && cat.id != currentFilter) return;
-                let filteredItems = cat.items.filter(item => { const d = new Date(item.date); return d.getMonth() === currentDate.getMonth() && d.getFullYear() === currentDate.getFullYear(); });
-                if(searchTerm) filteredItems = filteredItems.filter(item => item.text.toLowerCase().includes(searchTerm));
-                const catTotal = filteredItems.reduce((sum, item) => sum + item.amount, 0); 
-                if(!searchTerm) totalExpenses += catTotal;
-                if(searchTerm && filteredItems.length === 0) return;
-                const spentPos = Math.abs(Math.min(0, catTotal)); const limit = cat.limit || 1000; const percent = Math.min(100, (spentPos / limit) * 100);
-                let colorClass = percent > 100 ? 'bg-red' : (percent > 75 ? 'bg-yellow' : 'bg-green'); let balanceStyle = percent >= 100 ? 'color:var(--danger)' : '';
-                const card = document.createElement('div'); card.className = 'category-card animate-item'; card.setAttribute('data-id', cat.id); 
-                card.innerHTML = `
-                    <div class="cat-delete-main-btn" onclick="deleteCategoryMain(${cat.id})"><i class="fas fa-times"></i></div><div class="drag-handle"><i class="fas fa-sort"></i></div>
-                    <div class="card-header"><div class="cat-info"><div class="cat-emoji">${cat.emoji}</div><div><div style="font-weight:bold">${cat.name}</div><div class="cat-limit" onclick="openLimitModal(${cat.id})">${t('budget')} ${limit} <i class="fas fa-pen" style="font-size:0.7rem"></i></div></div></div><div class="current-spend" style="${balanceStyle}">${formatMoney(catTotal)}</div></div>
-                    <div class="progress-track"><div class="progress-fill ${colorClass}" style="width:${percent}%"></div></div>
-                    <ul class="items-list">${filteredItems.map(item => {
-                        let icon = item.method === 'cash' ? '<i class="fas fa-money-bill-wave pay-method-icon"></i>' : (item.method === 'transfer' ? '<i class="fas fa-university pay-method-icon"></i>' : '<i class="fas fa-credit-card pay-method-icon"></i>');
-                        return `<li class="item-row"><span>${item.text} ${item.isAuto ? '<i class="fas fa-robot"></i>' : ''}</span><div>${icon}<span class="${item.amount < 0 ? 'amount-neg' : 'amount-pos'}">${formatMoney(Math.abs(item.amount))}</span><i class="fas fa-copy" onclick="duplicateItem(${cat.id}, '${item.id}')" style="margin:0 5px; color:#aaa; cursor:pointer;"></i><i class="fas fa-times" onclick="deleteItem(${cat.id}, '${item.id}')" style="margin-right:5px; color:#ccc; cursor:pointer;"></i></div></li>`
-                    }).join('')}</ul>
-                    <div class="quick-add"><div class="qa-row"><input id="d-${cat.id}" class="qa-input" placeholder="${t('desc_placeholder')}"></div><div class="qa-row"><input id="a-${cat.id}" type="number" class="qa-input" placeholder="${t('amount_placeholder')}"><select id="m-${cat.id}" class="qa-input" style="flex:0.5"><option value="credit">💳</option><option value="cash">💵</option><option value="transfer">🏦</option></select></div><button class="qa-btn" onclick="addItem(${cat.id})"><i class="fas fa-plus"></i> ${t('add')}</button></div>`;
-                container.appendChild(card);
-            });
-
-            if(categorySortable) categorySortable.destroy();
-            categorySortable = new Sortable(container, { animation: 150, handle: '.drag-handle', onEnd: function (evt) { const item = appData.categories.splice(evt.oldIndex, 1)[0]; appData.categories.splice(evt.newIndex, 0, item); saveData(); } });
-
-            if(!searchTerm) {
-                const bank = parseFloat(appData.bank) || 0; 
-                const salary = parseFloat(appData.monthlySalaries?.[key]) || 0; 
-                const total = bank + salary + totalExpenses;
-                const totalSaved = appData.goals.reduce((acc, g) => acc + g.current, 0);
-                const leftToSpend = total - totalSaved;
-                document.getElementById('global-balance').innerText = formatMoney(total); 
-                document.getElementById('global-balance').style.color = total < 0 ? 'var(--danger)' : 'white';
-                document.getElementById('left-to-spend').innerText = t('left_to_spend') + ' ' + formatMoney(leftToSpend);
-                renderHistoryChart();
-            }
-            renderSavings();
-        }
-
-        function duplicateItem(catId, itemId) {
-            triggerHaptic();
-            const cat = appData.categories.find(c => c.id === catId);
-            if(!cat) return;
-            const item = cat.items.find(i => i.id === itemId);
-            if(!item) return;
-            const newItem = { ...item, id: Date.now().toString(), date: currentDate.toISOString(), isAuto: false, fromRecurId: null };
-            cat.items.push(newItem);
-            saveAndRender();
-            showAppAlert(t('alert_title'), 'Item Duplicated', '📄');
-        }
-
         function deleteCategoryMain(id) { document.getElementById('delete-cat-target-id').value = id; document.getElementById('delete-category-modal').classList.add('open'); }
         function closeDeleteCatModal() { document.getElementById('delete-category-modal').classList.remove('open'); }
         function performCategoryDelete() { const id = parseInt(document.getElementById('delete-cat-target-id').value); if(id) { appData.categories = appData.categories.filter(c => c.id !== id); saveAndRender(); closeDeleteCatModal(); showAppAlert(t('alert_title'), 'Deleted', '🗑️'); } }
@@ -1221,6 +1173,7 @@
         function renderHistoryChart() { const ctx = document.getElementById('expenseChart').getContext('2d'); if(chartInstance) chartInstance.destroy(); let config = {}; if (chartType === 'bar') { let labels = [], data = []; for(let i=5; i>=0; i--) { let d = new Date(); d.setMonth(d.getMonth() - i); labels.push(d.toLocaleDateString(translations[currentLang].locale, {month:'short'})); let mTotal = 0; appData.categories.forEach(cat => { cat.items.forEach(item => { let iDate = new Date(item.date); if(iDate.getMonth() === d.getMonth() && iDate.getFullYear() === d.getFullYear()) { if(item.amount < 0) mTotal += Math.abs(item.amount); } }); }); data.push(mTotal); } config = { type: 'bar', data: { labels, datasets: [{ label: t('col_amount'), data, backgroundColor: '#4e54c8', borderRadius: 4 }] }, options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } }; } else { let labels = [], data = []; let colors = ['#ff7675', '#74b9ff', '#55efc4', '#a29bfe', '#ffeaa7', '#fd79a8']; appData.categories.forEach(cat => { let catSum = 0; cat.items.forEach(item => { let iDate = new Date(item.date); if(iDate.getMonth() === currentDate.getMonth() && iDate.getFullYear() === currentDate.getFullYear()) { if(item.amount < 0) catSum += Math.abs(item.amount); } }); if(catSum > 0) { labels.push(cat.name); data.push(catSum); } }); config = { type: 'pie', data: { labels, datasets: [{ data, backgroundColor: colors }] }, options: { maintainAspectRatio: false } }; } chartInstance = new Chart(ctx, config); }
         function addItem(catId) { triggerHaptic(); const desc = document.getElementById(`d-${catId}`).value; const amount = document.getElementById(`a-${catId}`).value; const method = document.getElementById(`m-${catId}`).value; if(!desc || !amount) return; const cat = appData.categories.find(c => c.id === catId); const val = parseFloat(amount); cat.items.push({ id: Date.now().toString(), text: desc, amount: -Math.abs(val), date: currentDate.toISOString(), method: method }); saveAndRender(); }
         function deleteItem(catId, itemId) { triggerHaptic(); const cat = appData.categories.find(c => c.id === catId); if(!cat) return; const item = cat.items.find(i => i.id === itemId); if(item && item.fromRecurId && appData.recurringSettings) { appData.recurringSettings = appData.recurringSettings.filter(rec => rec.id !== item.fromRecurId); saveData(); } cat.items = cat.items.filter(i => i.id !== itemId); saveAndRender(); }
+        function duplicateItem(catId, itemId) { triggerHaptic(); const cat = appData.categories.find(c => c.id === catId); if(!cat) return; const item = cat.items.find(i => i.id === itemId); if(!item) return; const newItem = { ...item, id: Date.now().toString(), date: currentDate.toISOString(), isAuto: false, fromRecurId: null }; cat.items.push(newItem); saveAndRender(); showAppAlert(t('alert_title'), 'Item Duplicated', '📄'); }
         function openSettingsModal() { toggleMenu(); document.getElementById('settings-modal').classList.add('open'); }
         async function exportDataJSON() { const dataStr = JSON.stringify(appData); const file = new File([dataStr], 'budget_backup.json', { type: 'application/json' }); if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: 'Backup' }); } catch(err) {} } else { const a = document.createElement('a'); a.href = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr); a.download = 'budget_backup.json'; a.click(); } }
         async function exportToCSV() { let csv = "\uFEFFDate,Category,Desc,Amount,Method\n"; appData.categories.forEach(cat => { cat.items.forEach(i => { csv += `${new Date(i.date).toLocaleDateString()},${cat.name},${i.text},${i.amount},${i.method}\n` }); }); const file = new File([csv], 'export.csv', { type: 'text/csv' }); if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: 'Export' }); } catch(err) {} } else { const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,'+ encodeURIComponent(csv); a.download = 'export.csv'; a.click(); } }
@@ -1249,6 +1202,11 @@
 
         function calcLoan() { triggerHaptic(); const amount = parseFloat(document.getElementById('loan-amount').value); const rate = parseFloat(document.getElementById('loan-rate').value); const years = parseFloat(document.getElementById('loan-years').value); if(amount && rate && years) { const r = rate / 100 / 12; const n = years * 12; const monthly = amount * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1); document.getElementById('loan-result').innerText = formatMoney(monthly); } }
         function calcSplit() { triggerHaptic(); const amount = parseFloat(document.getElementById('split-amount').value); const tip = parseFloat(document.getElementById('split-tip').value); const people = parseFloat(document.getElementById('split-people').value); if(amount && people) { const total = amount * (1 + tip/100); const perPerson = total / people; document.getElementById('split-result').innerText = formatMoney(perPerson); } }
+        function renderWishlist() { const container = document.getElementById('wishlist-container'); if(!container) return; container.innerHTML = ''; if(!appData.wishlist || appData.wishlist.length === 0) { container.innerHTML = `<div style="text-align:center; padding:20px; opacity:0.6;">${t('no_items')}</div>`; return; } appData.wishlist.forEach((item, index) => { const div = document.createElement('div'); div.className = 'wishlist-item animate-item'; div.innerHTML = `<div class="w-info"><div class="w-name">${item.name}</div><div class="w-price">${formatMoney(item.price)}</div></div><div class="w-actions"><button class="w-btn buy" onclick="openBuyItemModal(${index})"><i class="fas fa-check"></i></button><button class="w-btn del" onclick="deleteWishlistItem(${index})"><i class="fas fa-trash"></i></button></div>`; container.appendChild(div); }); }
+        function addWishlistItem() { triggerHaptic(); const name = document.getElementById('wish-name').value; const price = parseFloat(document.getElementById('wish-price').value); if(name && price) { appData.wishlist.push({name, price}); saveData(); renderWishlist(); document.getElementById('wish-name').value = ''; document.getElementById('wish-price').value = ''; } }
+        function deleteWishlistItem(index) { triggerHaptic(); appData.wishlist.splice(index, 1); saveData(); renderWishlist(); }
+        function openBuyItemModal(index) { document.getElementById('buy-item-index').value = index; const select = document.getElementById('buy-cat-select'); select.innerHTML = appData.categories.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join(''); document.getElementById('buy-item-modal').classList.add('open'); }
+        function confirmBuyItem() { triggerHaptic(); const index = parseInt(document.getElementById('buy-item-index').value); const catId = document.getElementById('buy-cat-select').value; const item = appData.wishlist[index]; const cat = appData.categories.find(c => c.id == catId); if(cat && item) { cat.items.push({ id: Date.now().toString(), text: item.name, amount: -Math.abs(item.price), date: currentDate.toISOString(), method: 'credit' }); appData.wishlist.splice(index, 1); saveAndRender(); renderWishlist(); document.getElementById('buy-item-modal').classList.remove('open'); showAppAlert(t('alert_title'), 'Purchased!', '🛍️'); } }
         
         // SSC
         function initSalaryCalculator() {
@@ -1264,7 +1222,7 @@
             function loadData(){ if(state.mode === 'mishmar') { state.categories = MISHMAR_CATS; } else { try{state.categories=JSON.parse(localStorage.getItem('ssc:cats_generic')||'[]');}catch{state.categories=[];} if(!state.categories.length) state.categories=[{id:'g1',name:'משמרת רגילה',slices:[{p:100,h:8}]}]; } const storeKey=`ssc:counts:${state.mode}:${state.ym}`; try{state.counts=JSON.parse(localStorage.getItem(storeKey)||'{}');}catch{state.counts={};} const quickKey=`ssc:quick:${state.mode}:${state.ym}`; try{state.quickRows=JSON.parse(localStorage.getItem(quickKey)||'[]');}catch{state.quickRows=[];} }
             function saveData(){ localStorage.setItem('ssc:cfg', JSON.stringify({hourly:state.hourly})); localStorage.setItem(`ssc:counts:${state.mode}:${state.ym}`, JSON.stringify(state.counts)); localStorage.setItem(`ssc:quick:${state.mode}:${state.ym}`, JSON.stringify(state.quickRows)); if(state.mode==='generic') localStorage.setItem('ssc:cats_generic', JSON.stringify(state.categories)); }
             function renderAll(){ els.grid.innerHTML=''; if(!state.categories.length){ document.getElementById('ssc_emptyState').style.display='block'; return;} document.getElementById('ssc_emptyState').style.display='none'; state.categories.forEach(c=>{ const n=state.counts[c.id]||0; const subtotal=payForShift(c)*n; const card=document.createElement('div'); card.className='ssc-card animate-item'; const delBtn = state.mode === 'generic' ? `<button class="ssc-del-cat" onclick="sscDeleteCategory('${c.id}')"><i class="fas fa-times"></i></button>` : ''; card.innerHTML=`${delBtn}<h3>${c.name}</h3><div class="ssc-meta">${getShiftInfo(c).desc}</div><div class="ssc-counter"><div class="ssc-iconbtn" onclick="sscUpdateCount('${c.id}', -1)">−</div><div class="ssc-count">${n}</div><div class="ssc-iconbtn" onclick="sscUpdateCount('${c.id}', 1)">+</div></div><div class="ssc-meta" style="text-align:end">${t('col_total')}: <b>${fmt(subtotal)}</b></div>`; els.grid.appendChild(card); }); renderQuick(); calcAndRenderTotals(); }
-            function renderQuick(){ els.quick.innerHTML=''; state.quickRows.forEach((r,i)=>{ const div=document.createElement('div'); div.className='ssc-editor-slice'; div.innerHTML=`<input type="text" class="ssc-inp" value="${r.label||''}" onchange="sscUpdateQuick(${i}, 'label', this.value)" placeholder="${t('col_desc')}" style="flex:2"><input type="number" class="ssc-inp" value="${r.h}" step="0.5" onchange="sscUpdateQuick(${i}, 'h', this.value)" placeholder="${t('col_hours')}" style="flex:1;text-align:center"><input type="number" class="ssc-inp" value="${r.p}" onchange="sscUpdateQuick(${i}, 'p', this.value)" placeholder="${t('col_percent')}" style="flex:1;text-align:center"><button class="ssc-btn-close-slice" onclick="sscRemoveQuick(${i})"><i class="fas fa-times"></i></button>`; els.quick.appendChild(div); }); }
+            function renderQuick(){ els.quick.innerHTML=''; state.quickRows.forEach((r,i)=>{ const div=document.createElement('div'); div.className='ssc-editor-slice'; div.innerHTML=`<input type="text" class="ssc-inp" value="${r.label||''}" onchange="sscUpdateQuick(${i}, 'label', this.value)" placeholder="${t('col_desc')}" style="flex:2"><input type="number" class="ssc-inp" value="${r.h}" step="0.5" onchange="sscUpdateQuick(${i}, 'h', this.value)" placeholder="${t('col_hours')}" style="flex:1;text-align:center"><input type="number" class="ssc-inp" value="${r.p}" onchange="sscUpdateQuick(${i}, 'p', this.value)" placeholder="${t('col_percent')}" style="flex:1;text-align:center"><button class="ssc-btn-close-slice" onclick="this.parentElement.remove()" style="margin-top:15px"><i class="fas fa-times"></i></button>`; els.quick.appendChild(div); }); }
             function calcAndRenderTotals(){ let shifts=0, hours=0, money=0; let tbodyHtml=''; state.categories.forEach(c=>{ const n=state.counts[c.id]||0; if(n>0){ const info=getShiftInfo(c); const subMoney=payForShift(c)*n; const subHours=info.totalHours*n; shifts+=n; hours+=subHours; money+=subMoney; tbodyHtml+=`<tr><td style="text-align:start">${c.name}</td><td>${n}</td><td>${subHours}</td><td>${fmt(subMoney)}</td></tr>`; } }); let qMoney=0; state.quickRows.forEach(r=>{ qMoney+=(state.hourly*(r.p/100)*r.h); }); if(qMoney>0||state.quickRows.length>0){ money+=qMoney; tbodyHtml+=`<tr><td colspan="3" style="text-align:start">${t('free_calc_title')}</td><td>${fmt(qMoney)}</td></tr>`; } els.tShifts.textContent=shifts; els.tHours.textContent=parseFloat(hours.toFixed(2)); els.gTotal.textContent=fmt(money); els.details.innerHTML=tbodyHtml; els.dTotal.textContent=fmt(money); els.quickSum.textContent=fmt(qMoney); }
             function getShiftInfo(c){ let h=0; const parts=c.slices.map(s=>{ h+=+s.h; return `${s.p}%×${s.h}h`; }); return {totalHours:h, desc:`${h}h (${parts.join(' + ')})`}; }
             function payForShift(c){ if(!state.hourly)return 0; return c.slices.reduce((sum,s)=>sum+(state.hourly*(s.p/100)*s.h),0); }
@@ -1282,6 +1240,7 @@
             els.month.onchange=()=>{ state.ym=els.month.value; loadData(); renderAll(); };
             $('#ssc_saveTemplateBtn').onclick=()=>{ const name=$('#ssc_newShiftName').value.trim(); const slices=[]; document.querySelectorAll('#ssc_newShiftSlices .ssc-editor-slice').forEach(div=>{ slices.push({p:+div.querySelector('.e-p').value, h:+div.querySelector('.e-h').value}); }); if(name && slices.length){ state.categories.push({id:'g'+Date.now(),name,slices}); saveData(); renderAll(); $('#ssc_newShiftName').value=''; $('#ssc_newShiftSlices').innerHTML=''; window.sscAddEditorSlice(); } };
         }
+
         document.addEventListener('click', function(e) {
             if (e.target && e.target.id === 'ssc_secretBtn') {
                 const input = document.getElementById('ssc_secretCode');

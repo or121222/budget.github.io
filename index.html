@@ -79,7 +79,7 @@
         .page { display: none; animation: fadeIn 0.3s ease; padding-bottom: 80px; }
         .page.active { display: block; }
 
-        /* === CONVERTER STYLES === */
+        /* === CONVERTER STYLES (VERTICAL) === */
         .converter-box {
             background: var(--card-bg);
             border-radius: 20px;
@@ -88,35 +88,58 @@
             box-shadow: var(--shadow);
             border: var(--glass-border);
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* רווח בין הקומות */
         }
-        .conv-row { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
+        
+        .conv-label {
+            text-align: start;
+            font-size: 0.9rem;
+            color: var(--text-sec);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
         .conv-input {
             width: 100%; padding: 15px; border-radius: 12px;
             border: 1px solid rgba(0,0,0,0.1); background: rgba(0,0,0,0.02);
-            font-size: 1.2rem; color: var(--text-main); font-weight: bold;
-            text-align: center;
+            font-size: 1.5rem; color: var(--text-main); font-weight: bold;
+            text-align: center; outline: none;
         }
-        .conv-select {
-            flex: 1; padding: 15px; border-radius: 12px;
-            border: 1px solid rgba(0,0,0,0.1); background: var(--bg-color);
-            font-size: 0.9rem; color: var(--text-main);
-            max-width: 100%;
-        }
-        .conv-arrow-container { padding: 0 5px; color: var(--text-sec); font-size: 1.2rem; display: flex; align-items: center; }
         
+        .conv-select {
+            width: 100%; padding: 15px; border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.1); background: var(--bg-color);
+            font-size: 1rem; color: var(--text-main);
+            appearance: none; /* עיצוב נקי יותר */
+        }
+
+        /* כפתור החץ באמצע */
+        .conv-swap-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: -5px 0; /* קצת חפיפה כדי שיראה יפה */
+            z-index: 5;
+        }
+
         .conv-swap-btn {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: var(--primary); color: white; border: none;
+            width: 45px; height: 45px; border-radius: 50%;
+            background: var(--primary); color: white; border: 2px solid var(--card-bg);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            margin: 0 auto 15px auto;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
         }
+        .conv-swap-btn:active { transform: scale(0.9); }
+
         .conv-result {
-            margin-top: 20px; padding: 20px;
+            margin-top: 10px; padding: 20px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white; border-radius: 15px;
         }
-        .conv-res-big { font-size: 2rem; font-weight: bold; direction: ltr; }
+        .conv-res-big { font-size: 2.2rem; font-weight: bold; direction: ltr; }
         .conv-res-sub { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; direction: ltr; }
 
         /* === PIN LOCK SCREEN === */
@@ -443,25 +466,33 @@
         </header>
         
         <div class="converter-box">
-            <div class="conv-row">
+            <div>
+                <div class="conv-label" data-lang="amount_placeholder">סכום</div>
                 <input type="number" id="conv-amount" class="conv-input" value="1" placeholder="1" oninput="convertCurrency()">
             </div>
             
-            <div class="conv-row">
+            <div>
+                <div class="conv-label">ממטבע / From</div>
                 <select id="conv-from" class="conv-select" onchange="convertCurrency()"></select>
-                <div class="conv-arrow-container"><i class="fas fa-arrow-left conv-arrow-icon"></i></div>
-                <select id="conv-to" class="conv-select" onchange="convertCurrency()"></select>
             </div>
 
-            <button class="conv-swap-btn" onclick="swapCurrencies()"><i class="fas fa-exchange-alt" style="transform: rotate(90deg);"></i></button>
+            <div class="conv-swap-container">
+                <button class="conv-swap-btn" onclick="swapCurrencies()">
+                    <i class="fas fa-arrow-down"></i>
+                </button>
+            </div>
 
-            <button class="btn-primary" onclick="convertCurrency()" data-lang="convert_btn">המר כעת</button>
+            <div>
+                <div class="conv-label">למטבע / To</div>
+                <select id="conv-to" class="conv-select" onchange="convertCurrency()"></select>
+            </div>
 
             <div class="conv-result">
                 <div class="conv-res-big" id="conv-result-big">---</div>
                 <div class="conv-res-sub" id="conv-result-sub"></div>
             </div>
-            <div style="margin-top:10px; font-size:0.8rem; opacity:0.6;">Rates by ExchangeRate-API</div>
+            
+            <div style="font-size:0.7rem; opacity:0.5; margin-top:5px;">Rates by ExchangeRate-API</div>
         </div>
         <div class="ad-spacer"></div>
     </div>
@@ -1326,3 +1357,4 @@
     </script>
 </body>
 </html>
+

@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+<script>
+    window.onerror = function(message, source, lineno, colno, error) {
+        alert("שגיאה באפליקציה:\n" + message + "\nשורה: " + lineno);
+    };
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Neto</title>
@@ -769,7 +774,7 @@
             he: {
                 dir: 'rtl', locale: 'he-IL', remove_pin: "הסר קוד נעילה",
                 app_title: "Neto", subtitle: "ניהול תקציב חכם ופשוט", daily_tip: "טיפ יומי", start_btn: "בואו נתחיל",
-                menu_title: "תפריט", menu_home: "ראשי", menu_c16:35 12/6/2025onverter: "ממיר מטבעות", menu_recur: "הוצאות קבועות", menu_calc: "מחשבון שכר", menu_loan: "מחשבון הלוואה", menu_split: "פיצול חשבון", menu_wishlist: "רשימת משאלות", menu_pro: "פרימיום", menu_backup: "הגדרות", menu_dark: "מצב לילה", setup_pin: "הגדרת קוד נעילה",
+                menu_title: "תפריט", menu_home: "ראשי", menu_converter: "ממיר מטבעות", menu_recur: "הוצאות קבועות", menu_calc: "מחשבון שכר", menu_loan: "מחשבון הלוואה", menu_split: "פיצול חשבון", menu_wishlist: "רשימת משאלות", menu_pro: "פרימיום", menu_backup: "הגדרות", menu_dark: "מצב לילה", setup_pin: "הגדרת קוד נעילה",
                 balance_label: "עו\"ש בבנק", salary_label: "משכורת", filter_all: "כל הקטגוריות", search_ph: "חיפוש הוצאות...", left_to_spend: "נותר לבזבוז:",
                 savings_title: "קופות חיסכון", new_goal_btn: "+ יעד חדש", chart_toggle: "החלף תצוגה",
                 budget: "תקציב:", add: "הוסף", desc_placeholder: "תיאור", amount_placeholder: "סכום",

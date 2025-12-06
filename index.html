@@ -630,7 +630,7 @@
 
             <button class="btn-primary" onclick="exportDataJSON()" style="margin-bottom:10px; background:var(--primary)"><i class="fas fa-share-alt"></i> <span data-lang="backup_btn">גיבוי מלא (שתף)</span></button>
             <label class="btn-primary" style="background:var(--secondary); display:block; cursor:pointer; margin-bottom:10px"><i class="fas fa-file-import"></i> <span data-lang="restore_btn">שחזור מגיבוי</span><input type="file" onchange="importDataJSON(this)" style="display:none"></label>
-            <button class="btn-primary" onclick="exportToCSV()" style="margin-bottom:10px; background:var(--success)"><i class="fas fa-file-csv"></i> <span data-lang="export_btn">ייצוא לאקסל (שתף)</span></button>
+            <button class="btn-primary" onclick="()" style="margin-bottom:10px; background:var(--success)"><i class="fas fa-file-csv"></i> <span data-lang="export_btn">ייצוא לאקסל (שתף)</span></button>
             <button class="btn-primary" style="background:#ccc; color:#333; margin-top:10px" onclick="toggleMenu(); document.getElementById('settings-modal').classList.remove('open')" data-lang="close">סגור</button>
         </div>
     </div>
@@ -1179,21 +1179,47 @@ function setCurrency(code) {
     const dataStr = JSON.stringify(appData);
     const fileName = 'budget_backup.json';
 
-    // בדיקה אם אנחנו באפליקציה
     if (typeof Android !== "undefined" && Android.saveFile) {
         Android.saveFile(dataStr, fileName, "application/json");
     } else {
-        // קוד להורדה במחשב/דפדפן רגיל...
-        const blob = new Blob([dataStr], {type: "application/json"});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.click();
+        const file = new File([dataStr], fileName, { type: 'application/json' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try { await navigator.share({ files: [file], title: 'Backup' }); } catch(err) {}
+        } else {
+            const a = document.createElement('a');
+            a.href = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            a.download = fileName;
+            a.click();
+        }
     }
 }
-        async function exportToCSV() { let csv = "\uFEFFDate,Category,Desc,Amount,Method\n"; appData.categories.forEach(cat => { cat.items.forEach(i => { csv += `${new Date(i.date).toLocaleDateString()},${cat.name},${i.text},${i.amount},${i.method}\n` }); }); const file = new File([csv], 'export.csv', { type: 'text/csv' }); if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: 'Export' }); } catch(err) {} } else { const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,'+ encodeURIComponent(csv); a.download = 'export.csv'; a.click(); } }
-        function importDataJSON(input) { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const loadedData = JSON.parse(e.target.result); if(loadedData.categories) { appData = loadedData; saveData(); location.reload(); } } catch(err) { alert("Error"); } }; reader.readAsText(file); }
+async function exportToCSV() {
+    let csv = "\uFEFFDate,Category,Desc,Amount,Method\n";
+    appData.categories.forEach(cat => {
+        cat.items.forEach(i => {
+            csv += `${new Date(i.date).toLocaleDateString()},${cat.name},${i.text},${i.amount},${i.method}\n`
+        });
+    });
+
+    const fileName = 'budget_export.csv';
+
+    // בדיקה: האם אנחנו בתוך האפליקציה?
+    if (typeof Android !== "undefined" && Android.saveFile) {
+        // כן! שלח את המידע לאנדרואיד כדי שישמור
+        Android.saveFile(csv, fileName, "text/csv");
+    } else {
+        // לא, אנחנו בדפדפן רגיל - נשתמש בשיטה הרגילה
+        const file = new File([csv], fileName, { type: 'text/csv' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try { await navigator.share({ files: [file], title: 'Export' }); } catch(err) {}
+        } else {
+            const a = document.createElement('a');
+            a.href = 'data:text/csv;charset=utf-8,'+ encodeURIComponent(csv);
+            a.download = fileName;
+            a.click();
+        }
+    }
+}        function importDataJSON(input) { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const loadedData = JSON.parse(e.target.result); if(loadedData.categories) { appData = loadedData; saveData(); location.reload(); } } catch(err) { alert("Error"); } }; reader.readAsText(file); }
         function changeMonth(delta) { triggerHaptic(); currentDate.setMonth(currentDate.getMonth() + delta); updateMonthDisplay(); renderApp(); }
         function updateMonthDisplay() { let loc = 'he-IL'; if(translations[currentLang]) loc = translations[currentLang].locale; document.getElementById('current-month-display').innerText = currentDate.toLocaleDateString(loc, { month: 'long', year: 'numeric' }); }
         function openCategoryModal() { document.getElementById('cat-modal').classList.add('open'); }
@@ -1270,4 +1296,5 @@ function setCurrency(code) {
     </script>
 </body>
 </html>
+
 

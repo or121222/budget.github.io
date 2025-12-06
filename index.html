@@ -65,11 +65,6 @@
         html[dir="ltr"] .chart-toggle { right: auto; left: 10px; }
         html[dir="ltr"] .ssc-del-cat { left: auto; right: 8px; }
         html[dir="ltr"] .pin-cancel-btn { right: auto; left: 20px; }
-        
-        /* Converter Arrow Logic */
-        /* RTL (Default): Arrow points Left (From -> To) */
-        .conv-arrow-icon { transform: rotate(0deg); transition: transform 0.3s; }
-        /* LTR: Arrow points Right */
         html[dir="ltr"] .conv-arrow-icon { transform: rotate(180deg); }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -79,145 +74,97 @@
         .page { display: none; animation: fadeIn 0.3s ease; padding-bottom: 80px; }
         .page.active { display: block; }
 
+        /* === Side Menu (Scrollable) === */
+        .side-menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .side-menu-overlay.open { opacity: 1; pointer-events: all; }
+        .side-menu { 
+            position: fixed; top: 0; right: -280px; bottom: 0; width: 280px; 
+            background: var(--card-bg); z-index: 1001; transition: 0.3s; 
+            padding: 100px 20px 20px 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); 
+            display: flex; flex-direction: column; gap: 5px;
+            overflow-y: auto; /* Enable Scroll */
+            max-height: 100vh;
+        }
+        .side-menu.open { right: 0; }
+        
+        /* Custom Scrollbar for menu */
+        .side-menu::-webkit-scrollbar { width: 6px; }
+        .side-menu::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 3px; }
+
+        .menu-item { display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: 12px; color: var(--text-main); font-weight: 500; font-size: 1.05rem; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+        .menu-item:hover { background: rgba(0,0,0,0.05); }
+        .menu-item.active { background: var(--primary); color: white; }
+
         /* === CONVERTER STYLES (VERTICAL) === */
-        .converter-box {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 25px;
-            margin: 20px;
-            box-shadow: var(--shadow);
-            border: var(--glass-border);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 15px; /* רווח בין הקומות */
-        }
-        
-        .conv-label {
-            text-align: start;
-            font-size: 0.9rem;
-            color: var(--text-sec);
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-
-        .conv-input {
-            width: 100%; padding: 15px; border-radius: 12px;
-            border: 1px solid rgba(0,0,0,0.1); background: rgba(0,0,0,0.02);
-            font-size: 1.5rem; color: var(--text-main); font-weight: bold;
-            text-align: center; outline: none;
-        }
-        
-        .conv-select {
-            width: 100%; padding: 15px; border-radius: 12px;
-            border: 1px solid rgba(0,0,0,0.1); background: var(--bg-color);
-            font-size: 1rem; color: var(--text-main);
-            appearance: none; /* עיצוב נקי יותר */
-        }
-
-        /* כפתור החץ באמצע */
-        .conv-swap-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: -5px 0; /* קצת חפיפה כדי שיראה יפה */
-            z-index: 5;
-        }
-
-        .conv-swap-btn {
-            width: 45px; height: 45px; border-radius: 50%;
-            background: var(--primary); color: white; border: 2px solid var(--card-bg);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            font-size: 1.2rem;
-            transition: transform 0.2s;
-        }
+        .converter-box { background: var(--card-bg); border-radius: 20px; padding: 25px; margin: 20px; box-shadow: var(--shadow); border: var(--glass-border); text-align: center; display: flex; flex-direction: column; gap: 15px; }
+        .conv-label { text-align: start; font-size: 0.9rem; color: var(--text-sec); margin-bottom: 5px; font-weight: 500; }
+        .conv-input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: rgba(0,0,0,0.02); font-size: 1.5rem; color: var(--text-main); font-weight: bold; text-align: center; outline: none; }
+        .conv-select { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: var(--bg-color); font-size: 1rem; color: var(--text-main); appearance: none; }
+        .conv-swap-container { display: flex; justify-content: center; align-items: center; margin: -5px 0; z-index: 5; }
+        .conv-swap-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--primary); color: white; border: 2px solid var(--card-bg); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 1.2rem; transition: transform 0.2s; }
         .conv-swap-btn:active { transform: scale(0.9); }
-
-        .conv-result {
-            margin-top: 10px; padding: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white; border-radius: 15px;
-        }
+        .conv-result { margin-top: 10px; padding: 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-radius: 15px; }
         .conv-res-big { font-size: 2.2rem; font-weight: bold; direction: ltr; }
         .conv-res-sub { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; direction: ltr; }
 
-        /* === PIN LOCK SCREEN === */
-        #pin-lock-screen {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--bg-color); z-index: 20000;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            padding: 20px; text-align: center;
-        }
-        #pin-lock-screen.active { display: flex; }
+        /* === LOAN & SPLIT & WISHLIST STYLES === */
+        .tool-card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin: 15px; box-shadow: var(--shadow); border: var(--glass-border); }
+        .tool-row { margin-bottom: 15px; }
+        .tool-label { display: block; margin-bottom: 5px; color: var(--text-sec); font-size: 0.9rem; }
+        .tool-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); background: var(--bg-color); color: var(--text-main); font-size: 1.1rem; }
+        .tool-result { margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.03); border-radius: 10px; text-align: center; }
+        .tool-res-val { font-size: 1.8rem; font-weight: bold; color: var(--primary); margin-top: 5px; direction: ltr; }
         
-        .pin-cancel-btn {
-            position: absolute; top: 40px; right: 20px;
-            background: transparent; border: none; font-size: 1.5rem; color: var(--text-sec);
-            cursor: pointer; padding: 10px; display: none;
-        }
+        .wishlist-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card-bg); margin-bottom: 10px; border-radius: 12px; box-shadow: var(--shadow); border: var(--glass-border); }
+        .w-info { flex: 1; }
+        .w-name { font-weight: bold; font-size: 1.1rem; }
+        .w-price { color: var(--text-sec); font-size: 0.9rem; margin-top: 3px; }
+        .w-actions { display: flex; gap: 10px; }
+        .w-btn { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; color: white; }
+        .w-btn.buy { background: var(--success); }
+        .w-btn.del { background: var(--danger); opacity: 0.8; }
 
+        /* === SEARCH BAR === */
+        .search-container { padding: 0 15px 15px 15px; }
+        .search-input { width: 100%; padding: 12px 40px 12px 15px; border-radius: 25px; border: none; background: rgba(0,0,0,0.05); color: var(--text-main); font-size: 1rem; }
+        .search-icon { position: absolute; top: 12px; left: 25px; color: var(--text-sec); }
+        html[dir="ltr"] .search-input { padding: 12px 15px 12px 40px; }
+        html[dir="ltr"] .search-icon { left: auto; right: 25px; }
+
+        /* === PIN LOCK SCREEN === */
+        #pin-lock-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-color); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+        #pin-lock-screen.active { display: flex; }
+        .pin-cancel-btn { position: absolute; top: 40px; right: 20px; background: transparent; border: none; font-size: 1.5rem; color: var(--text-sec); cursor: pointer; padding: 10px; display: none; }
         .pin-title { margin-bottom: 20px; font-size: 1.5rem; color: var(--text-main); font-weight: bold; }
         .pin-subtitle { margin-bottom: 30px; color: var(--text-sec); font-size: 1rem; min-height: 20px; }
-        
         .pin-dots { display: flex; gap: 15px; margin-bottom: 40px; }
         .pin-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--primary); transition: 0.2s; }
         .pin-dot.filled { background: var(--primary); }
         .pin-dot.error { border-color: var(--danger); background: var(--danger); animation: shake 0.3s; }
-
         .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 300px; width: 100%; }
-        .num-btn { 
-            background: var(--card-bg); border: var(--glass-border); color: var(--text-main);
-            font-size: 1.5rem; font-weight: 500; height: 70px; border-radius: 35px;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: var(--shadow); transition: 0.1s;
-        }
+        .num-btn { background: var(--card-bg); border: var(--glass-border); color: var(--text-main); font-size: 1.5rem; font-weight: 500; height: 70px; border-radius: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow); transition: 0.1s; }
         .num-btn:active { transform: scale(0.95); background: rgba(0,0,0,0.05); }
         .num-btn.dummy { visibility: hidden; pointer-events: none; }
         
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
 
-        /* --- Landing Page --- */
-        #page-landing {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            z-index: 9999;
-            display: none; 
-            flex-direction: column; align-items: center; justify-content: center; text-align: center;
-            padding: 30px; color: white; padding-bottom: 0;
-        }
+        /* === Landing Page === */
+        #page-landing { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, var(--primary), var(--secondary)); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; color: white; padding-bottom: 0; }
         #page-landing.active { display: flex; }
-        
         .landing-logo { margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
         .landing-title { font-size: 3.5rem; font-weight: 800; margin-bottom: 5px; letter-spacing: 2px; }
         .landing-subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 40px; font-weight: 300; }
-        
-        .landing-tip-card {
-            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3); padding: 20px; border-radius: 20px;
-            margin-bottom: 40px; max-width: 100%; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
+        .landing-tip-card { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); padding: 20px; border-radius: 20px; margin-bottom: 40px; max-width: 100%; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .landing-tip-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 10px; }
         .landing-tip-text { font-size: 1.1rem; font-style: italic; line-height: 1.5; }
-
-        .btn-start-app {
-            background: white; color: var(--primary); font-size: 1.4rem; font-weight: 700;
-            padding: 18px 60px; border-radius: 50px; border: none; cursor: pointer;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.2s, box-shadow 0.2s;
-            display: flex; align-items: center; gap: 10px; margin-bottom: 30px;
-        }
+        .btn-start-app { background: white; color: var(--primary); font-size: 1.4rem; font-weight: 700; padding: 18px 60px; border-radius: 50px; border: none; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.2s, box-shadow 0.2s; display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
         .btn-start-app:active { transform: scale(0.95); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
         /* Buttons */
         .lang-toggle-container { display: flex; gap: 15px; margin-top: 10px; justify-content: center; }
-        .lang-mini-btn {
-            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
-            color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; cursor: pointer;
-            backdrop-filter: blur(4px); transition: 0.2s; display: flex; align-items: center; gap: 6px;
-        }
+        .lang-mini-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; backdrop-filter: blur(4px); transition: 0.2s; display: flex; align-items: center; gap: 6px; }
         .lang-mini-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
         .lang-mini-btn.active { background: white; color: var(--primary); font-weight: bold; border-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        
         .side-menu .lang-toggle-container { margin-bottom: 5px; }
         .side-menu .lang-mini-btn { color: var(--text-main); border-color: rgba(0,0,0,0.1); background: rgba(0,0,0,0.05); }
         .side-menu .lang-mini-btn.active { background: var(--primary); color: white; }
@@ -225,27 +172,13 @@
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
 
         /* --- Components --- */
-        header.app-header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            padding: calc(var(--safe-area-top) + 15px) 20px 30px 20px;
-            border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
-            color: white; text-align: center; box-shadow: 0 10px 30px rgba(78, 84, 200, 0.4); margin-bottom: 20px; position: relative;
-        }
-
-        .menu-btn {
-            position: fixed; top: 50px; right: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border: none; color: white; width: 45px; height: 45px; border-radius: 50%;
-            font-size: 1.2rem; cursor: pointer; z-index: 1200;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; transition: transform 0.3s;
-        }
+        header.app-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: calc(var(--safe-area-top) + 15px) 20px 30px 20px; border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; color: white; text-align: center; box-shadow: 0 10px 30px rgba(78, 84, 200, 0.4); margin-bottom: 20px; position: relative; }
+        .menu-btn { position: fixed; top: 50px; right: 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; z-index: 1200; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; transition: transform 0.3s; }
         body.no-scroll { overflow: hidden; }
         .menu-btn:active { transform: scale(0.9); }
-
         .total-balance { font-size: 3rem; font-weight: 700; direction: ltr; margin: 5px 0 15px 0; text-shadow: 0 4px 10px rgba(0,0,0,0.15); }
         .month-selector { display: flex; justify-content: center; align-items: center; gap: 20px; font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 20px; }
         .month-arrow { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 1rem; padding: 8px 12px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(4px); }
-        
         .header-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .h-input-box { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 15px; padding: 10px; backdrop-filter: blur(5px); text-align: center; }
         .h-input-box label { font-size: 0.8rem; opacity: 0.9; display: block; margin-bottom: 2px; }
@@ -253,26 +186,13 @@
         .h-input-box input::placeholder { color: rgba(255,255,255,0.6); }
         .motivation-box { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 10px 15px; margin-top: 10px; backdrop-filter: blur(4px); min-height: 40px; display: flex; align-items: center; justify-content: center; }
         .motivation-text { color: rgba(255,255,255,0.95); font-size: 1rem; font-style: italic; }
-
-        .side-menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
-        .side-menu-overlay.open { opacity: 1; pointer-events: all; }
-        .side-menu { position: fixed; top: 0; right: -280px; bottom: 0; width: 280px; background: var(--card-bg); z-index: 1001; transition: 0.3s; padding: 100px 20px 20px 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 10px; }
-        .side-menu.open { right: 0; }
-        .menu-item { display: flex; align-items: center; gap: 15px; padding: 10px; border-radius: 12px; color: var(--text-main); font-weight: 500; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
-        .menu-item:hover { background: rgba(0,0,0,0.05); }
-        .menu-item.active { background: var(--primary); color: white; }
-
         .filter-bar { display: flex; gap: 10px; padding: 0 15px; margin-bottom: 15px; justify-content: flex-end; }
         .filter-select { background: var(--card-bg); border: 1px solid rgba(0,0,0,0.1); padding: 8px; border-radius: 10px; font-size: 0.9rem; color: var(--text-main); }
-        
         #categories-container { max-width: 800px; margin: 0 auto; padding: 0 15px; display: flex; flex-direction: column; gap: 15px; }
-        
         .category-card { background: var(--card-bg); border-radius: 15px; box-shadow: var(--shadow); border: var(--glass-border); overflow: hidden; backdrop-filter: blur(10px); position: relative; }
         .card-header { padding: 15px; padding-left: 45px; display: flex; justify-content: space-between; align-items: center; cursor: default; }
-        
         .drag-handle { position: absolute; top: 40px; left: 10px; width: 24px; height: 24px; color: #b2bec3; display: flex; align-items: center; justify-content: center; cursor: grab; font-size: 1.2rem; z-index: 10; touch-action: none; }
         .cat-delete-main-btn { position: absolute; top: 10px; left: 10px; width: 24px; height: 24px; background: rgba(255, 118, 117, 0.15); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; z-index: 10; }
-
         .cat-info { display: flex; align-items: center; gap: 10px; }
         .cat-emoji { background: rgba(100,100,100,0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; }
         .cat-limit { font-size: 0.8rem; color: var(--text-sec); text-decoration: underline; cursor: pointer; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; }
@@ -284,12 +204,10 @@
         .item-row { display: flex; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid rgba(0,0,0,0.03); font-size: 0.95rem; }
         .amount-pos { color: var(--success); font-weight: bold; } .amount-neg { color: var(--danger); font-weight: bold; }
         .pay-method-icon { margin-left: 8px; font-size: 0.8rem; color: var(--text-sec); }
-
         .quick-add { padding: 15px; background: rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 10px; }
         .qa-row { display: flex; gap: 10px; }
         .qa-input { padding: 12px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); background: var(--card-bg); color: var(--text-main); font-size: 1rem; flex: 1; min-width: 0; }
         .qa-btn { background: var(--text-main); color: var(--bg-color); border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1rem; display: flex; justify-content: center; align-items: center; gap: 5px; }
-
         .savings-container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
         .saving-card { color: white; border-radius: 15px; padding: 15px; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; }
         .saving-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -297,23 +215,18 @@
         .saving-progress-fill { background: white; height: 100%; width: 0%; transition: 0.5s; }
         .color-opt { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.2s; }
         .color-opt.selected { border-color: #333; transform: scale(1.1); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-
         .chart-container-card { max-width: 800px; margin: 20px auto; padding: 0 15px; }
         .chart-wrapper { background: var(--card-bg); border-radius: 15px; box-shadow: var(--shadow); border: var(--glass-border); padding: 15px; height: 320px; position: relative; }
         .chart-toggle { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.05); border: none; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; z-index: 10; }
-
         .recur-add-box { background: var(--card-bg); padding: 20px; margin: 15px; border-radius: 15px; box-shadow: var(--shadow); }
         .btn-primary { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer; }
         .ad-spacer { height: 60px; width: 100%; display: block; }
         .fab { position: fixed; bottom: 20px; left: 20px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(78, 84, 200, 0.5); cursor: pointer; border: none; z-index: 95; }
-        
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; justify-content: center; align-items: center; padding: 20px; opacity: 0; pointer-events: none; transition: 0.3s; }
         .modal-overlay.open { opacity: 1; pointer-events: all; }
         .modal-card { background: var(--bg-color); width: 100%; max-width: 400px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; }
         .emoji-grid { display: flex; gap: 5px; justify-content: center; margin-bottom: 10px; }
         .emoji-opt { font-size: 1.5rem; cursor: pointer; padding: 5px; border-radius: 5px; }
-
-        /* SSC */
         .ssc-wrap { padding: 15px; font-family:"Rubik", sans-serif; color: var(--text-main); }
         .ssc-header-container { text-align: center; margin-top: 40px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .ssc-glass-badge { background: rgba(255,255,255,0.2); color: #fff; padding: 6px 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; font-size: 0.9rem; font-weight: 500; backdrop-filter: blur(5px); }
@@ -361,54 +274,52 @@
         <div class="landing-logo">
             <img src="icon-192.png" alt="Logo" style="width: 120px; height: 120px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
         </div>
-        
         <div class="landing-title" data-lang="app_title">Neto</div>
         <div class="landing-subtitle" data-lang="subtitle">ניהול תקציב חכם ופשוט</div>
-        
         <div class="landing-tip-card">
             <div class="landing-tip-title"><i class="fas fa-lightbulb"></i> <span data-lang="daily_tip">טיפ יומי</span></div>
             <div class="landing-tip-text" id="landing-tip-text">...</div>
         </div>
-
         <button class="btn-start-app" onclick="navTo('dashboard')">
-            <span data-lang="start_btn">בואו נתחיל</span> 
-            <i class="fas fa-arrow-left" id="start-arrow"></i>
+            <span data-lang="start_btn">בואו נתחיל</span> <i class="fas fa-arrow-left" id="start-arrow"></i>
         </button>
-
         <div class="lang-toggle-container">
-            <button class="lang-mini-btn" onclick="setLanguage('he')" data-lang-btn="he">
-                <span>🇮🇱</span> <span>עברית</span>
-            </button>
-            <button class="lang-mini-btn" onclick="setLanguage('en')" data-lang-btn="en">
-                <span>🇺🇸</span> <span>English</span>
-            </button>
+            <button class="lang-mini-btn" onclick="setLanguage('he')" data-lang-btn="he"><span>🇮🇱</span> <span>עברית</span></button>
+            <button class="lang-mini-btn" onclick="setLanguage('en')" data-lang-btn="en"><span>🇺🇸</span> <span>English</span></button>
         </div>
     </div>
 
     <button class="menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-
     <div id="menu-overlay" class="side-menu-overlay" onclick="toggleMenu()"></div>
     
     <div id="side-menu" class="side-menu">
         <h2 style="color:var(--primary); padding:0 20px;" data-lang="menu_title">תפריט</h2>
         <div class="menu-item active" onclick="navTo('dashboard')"><i class="fas fa-home"></i> <span data-lang="menu_home">ראשי</span></div>
+        <div class="menu-item" onclick="navTo('recurring')"><i class="fas fa-sync-alt"></i> <span data-lang="menu_recur">קבועות</span></div>
         <div class="menu-item" onclick="navTo('converter')"><i class="fas fa-exchange-alt"></i> <span data-lang="menu_converter">ממיר מטבעות</span></div>
-        <div class="menu-item" onclick="navTo('recurring')"><i class="fas fa-sync-alt"></i> <span data-lang="menu_recur">הוצאות קבועות</span></div>
         <div class="menu-item" onclick="navTo('calc')"><i class="fas fa-calculator"></i> <span data-lang="menu_calc">מחשבון שכר</span></div>
+        <div class="menu-item" onclick="navTo('loan')"><i class="fas fa-hand-holding-usd"></i> <span data-lang="menu_loan">מחשבון הלוואה</span></div>
+        <div class="menu-item" onclick="navTo('split')"><i class="fas fa-utensils"></i> <span data-lang="menu_split">פיצול חשבון</span></div>
+        <div class="menu-item" onclick="navTo('wishlist')"><i class="fas fa-gift"></i> <span data-lang="menu_wishlist">משאלות</span></div>
         <div class="menu-item" onclick="navTo('premium')"><i class="fas fa-star"></i> <span data-lang="menu_pro">פרימיום</span></div>
-        <div class="menu-divider" style="height:1px;background:rgba(0,0,0,0.1);margin:10px 0;"></div>
+        
+        <div class="menu-divider" style="height:1px;background:rgba(0,0,0,0.1);margin:5px 0;"></div>
+        
         <div class="menu-item" onclick="openSettingsModal()"><i class="fas fa-cog"></i> <span data-lang="menu_backup">גיבוי ושחזור</span></div>
         <div class="menu-item" onclick="toggleDarkMode()"><i class="fas fa-moon"></i> <span data-lang="menu_dark">מצב לילה</span></div>
         <div class="menu-item" onclick="setupPinCode()"><i class="fas fa-lock"></i> <span data-lang="setup_pin">הגדרת קוד נעילה</span></div>
         
         <div class="menu-divider" style="height:1px;background:rgba(0,0,0,0.1);margin:5px 0;"></div>
+        
         <div class="lang-toggle-container">
             <button class="lang-mini-btn" onclick="setLanguage('he')" data-lang-btn="he">🇮🇱 עברית</button>
             <button class="lang-mini-btn" onclick="setLanguage('en')" data-lang-btn="en">🇺🇸 English</button>
         </div>
+        
         <div class="menu-divider" style="height:1px;background:rgba(0,0,0,0.1);margin:5px 0;"></div>
-        <div style="text-align:center; opacity:0.7; font-size:0.8rem; margin-bottom:5px;">מטבע / Currency</div>
-        <div class="lang-toggle-container">
+        
+        <div style="text-align:center; opacity:0.7; font-size:0.75rem; margin-bottom:2px;">מטבע / Currency</div>
+        <div class="lang-toggle-container" style="margin-bottom: 10px;">
             <button class="lang-mini-btn" onclick="setCurrency('ILS')" data-curr-btn="ILS">₪</button>
             <button class="lang-mini-btn" onclick="setCurrency('USD')" data-curr-btn="USD">$</button>
             <button class="lang-mini-btn" onclick="setCurrency('EUR')" data-curr-btn="EUR">€</button>
@@ -431,6 +342,11 @@
             </div>
             <div class="motivation-box"><i class="fas fa-quote-right" style="margin-left:5px; opacity:0.8"></i><span class="motivation-text" id="motivation-text">...</span></div>
         </header>
+
+        <div style="position:relative; margin: -15px 15px 15px 15px;">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="search-bar" class="search-input" data-lang-placeholder="search_ph" placeholder="חיפוש..." oninput="renderApp()">
+        </div>
 
         <div class="filter-bar">
             <select id="cat-filter" class="filter-select" onchange="renderApp()"><option value="all" data-lang="filter_all">כל הקטגוריות</option></select>
@@ -462,36 +378,14 @@
     <div id="page-converter" class="page">
         <header class="app-header" style="padding-bottom: 20px;">
             <div style="height:20px"></div>
-            <h2 data-lang="converter_title">ממיר מטבעות</h2>
+            <h2 data-lang="menu_converter">ממיר מטבעות</h2>
         </header>
-        
         <div class="converter-box">
-            <div>
-                <div class="conv-label" data-lang="amount_placeholder">סכום</div>
-                <input type="number" id="conv-amount" class="conv-input" value="1" placeholder="1" oninput="convertCurrency()">
-            </div>
-            
-            <div>
-                <div class="conv-label">ממטבע / From</div>
-                <select id="conv-from" class="conv-select" onchange="convertCurrency()"></select>
-            </div>
-
-            <div class="conv-swap-container">
-                <button class="conv-swap-btn" onclick="swapCurrencies()">
-                    <i class="fas fa-arrow-down"></i>
-                </button>
-            </div>
-
-            <div>
-                <div class="conv-label">למטבע / To</div>
-                <select id="conv-to" class="conv-select" onchange="convertCurrency()"></select>
-            </div>
-
-            <div class="conv-result">
-                <div class="conv-res-big" id="conv-result-big">---</div>
-                <div class="conv-res-sub" id="conv-result-sub"></div>
-            </div>
-            
+            <div><div class="conv-label" data-lang="amount_placeholder">סכום</div><input type="number" id="conv-amount" class="conv-input" value="1" placeholder="1" oninput="convertCurrency()"></div>
+            <div><div class="conv-label">ממטבע / From</div><select id="conv-from" class="conv-select" onchange="convertCurrency()"></select></div>
+            <div class="conv-swap-container"><button class="conv-swap-btn" onclick="swapCurrencies()"><i class="fas fa-arrow-down"></i></button></div>
+            <div><div class="conv-label">למטבע / To</div><select id="conv-to" class="conv-select" onchange="convertCurrency()"></select></div>
+            <div class="conv-result"><div class="conv-res-big" id="conv-result-big">---</div><div class="conv-res-sub" id="conv-result-sub"></div></div>
             <div style="font-size:0.7rem; opacity:0.5; margin-top:5px;">Rates by ExchangeRate-API</div>
         </div>
         <div class="ad-spacer"></div>
@@ -502,7 +396,6 @@
             <div style="height:20px"></div>
             <h2 data-lang="recur_title">הוצאות קבועות</h2>
         </header>
-        
         <div class="recur-add-box">
             <h3 style="margin-top:0; color:var(--primary); margin-bottom:15px;" data-lang="add_new">+ הוספה חדשה</h3>
             <div style="display:flex; gap:5px;">
@@ -512,19 +405,11 @@
             <select id="rec-cat-select" class="qa-input" style="width:100%; margin-top:10px; margin-bottom:10px;"></select>
             <button class="btn-primary" onclick="addRecurringSetting()" style="width: 50%; margin: 10px auto; display: block;" data-lang="save_order">שמור הוראה</button>
         </div>
-
         <div class="ssc-panel" style="margin: 0 15px;">
             <h3 style="margin-top:0; margin-bottom:10px; color:var(--text-main);" data-lang="active_orders">רשימת הוראות פעילות</h3>
             <div style="overflow-x:auto;">
                 <table class="ssc-table" style="width:100%;">
-                    <thead>
-                        <tr>
-                            <th style="width:30%" data-lang="col_name">שם</th>
-                            <th style="width:30%" data-lang="col_cat">קטגוריה</th>
-                            <th style="text-align:center" data-lang="col_amount">סכום</th>
-                            <th style="text-align:center" data-lang="col_del">מחק</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th style="width:30%" data-lang="col_name">שם</th><th style="width:30%" data-lang="col_cat">קטגוריה</th><th style="text-align:center" data-lang="col_amount">סכום</th><th style="text-align:center" data-lang="col_del">מחק</th></tr></thead>
                     <tbody id="recurring-list-container"></tbody>
                 </table>
             </div>
@@ -536,7 +421,7 @@
         <header class="app-header" style="padding-bottom: 40px; border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;">
             <div style="height:20px"></div>
             <div class="ssc-header-container" style="margin: 0; color:white;">
-                <h2 style="margin:0; font-size:3rem; font-weight:700; text-shadow: 0 4px 10px rgba(0,0,0,0.15);" data-lang="calc_title">חישוב שכר</h2>
+                <h2 style="margin:0; font-size:3rem; font-weight:700;" data-lang="calc_title">חישוב שכר</h2>
                 <div class="ssc-controls-row">
                     <span id="ssc_modeBadge" class="ssc-glass-badge" data-lang="mode_free">מצב עריכה חופשי</span>
                     <button class="ssc-glass-btn" onclick="sscResetMonth()"><i class="fas fa-sync-alt"></i> <span data-lang="reset">איפוס</span></button>
@@ -545,19 +430,13 @@
         </header>
         <div class="ssc-wrap" style="margin-top: -20px;">
             <section class="ssc-panel">
-                <div class="ssc-row">
-                    <label style="flex:1"><small data-lang="hourly_wage">שכר לשעה</small><input id="ssc_hourly" type="number" step="0.1" placeholder="0" class="ssc-inp"></label>
-                    <label style="flex:1"><small data-lang="month">חודש</small><input id="ssc_month" type="month" class="ssc-inp"></label>
-                </div>
+                <div class="ssc-row"><label style="flex:1"><small data-lang="hourly_wage">שכר לשעה</small><input id="ssc_hourly" type="number" step="0.1" placeholder="0" class="ssc-inp"></label><label style="flex:1"><small data-lang="month">חודש</small><input id="ssc_month" type="month" class="ssc-inp"></label></div>
             </section>
             <section class="ssc-panel" id="ssc_editorPanel">
                 <h3 style="margin-top:0;color:var(--primary)" data-lang="add_shift_title">הוספת סוג משמרת</h3>
                 <input type="text" id="ssc_newShiftName" data-lang-placeholder="shift_name_ph" placeholder="שם" class="ssc-inp" style="margin-bottom:10px;">
                 <div id="ssc_newShiftSlices"></div>
-                <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                    <button class="ssc-btn ghost" onclick="sscAddEditorSlice()" style="font-size:12px;" data-lang="add_step">+ הוסף מדרגה</button>
-                    <button class="ssc-btn acc" id="ssc_saveTemplateBtn" data-lang="save_type">שמור סוג</button>
-                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:10px;"><button class="ssc-btn ghost" onclick="sscAddEditorSlice()" style="font-size:12px;" data-lang="add_step">+ הוסף מדרגה</button><button class="ssc-btn acc" id="ssc_saveTemplateBtn" data-lang="save_type">שמור סוג</button></div>
             </section>
             <section class="ssc-panel" style="background:transparent; border:none; padding:0; box-shadow:none;">
                 <div class="ssc-grid" id="ssc_grid"></div>
@@ -570,24 +449,73 @@
             </div>
             <div class="ssc-panel" style="margin-top:16px">
                 <div style="font-weight:700;margin-bottom:12px; color:var(--text-main);" data-lang="free_calc_title">מחשבון חופשי (תוספות)</div>
-                <div style="display:flex; gap:10px; margin-bottom:5px; font-size:0.8rem; color:var(--text-sec); padding:0 5px;">
-                    <span style="flex:2" data-lang="col_desc">תיאור</span><span style="flex:1; text-align:center" data-lang="col_hours">שעות</span><span style="flex:1; text-align:center" data-lang="col_percent">אחוז %</span><span style="width:30px"></span>
-                </div>
+                <div style="display:flex; gap:10px; margin-bottom:5px; font-size:0.8rem; color:var(--text-sec); padding:0 5px;"><span style="flex:2" data-lang="col_desc">תיאור</span><span style="flex:1; text-align:center" data-lang="col_hours">שעות</span><span style="flex:1; text-align:center" data-lang="col_percent">אחוז %</span><span style="width:30px"></span></div>
                 <div id="ssc_quickRows"></div>
                 <div class="ssc-row" style="margin-top:12px"><button class="ssc-btn acc" onclick="sscAddQuickRow()" style="font-size:12px; width:100%;" data-lang="add_row">+ הוסף שורה</button></div>
                 <div style="text-align:left; margin-top:10px; font-weight:bold; color:var(--text-sec);"><span data-lang="total_additions">סה״כ תוספות:</span> <span id="ssc_quickSum">0</span></div>
             </div>
             <section class="ssc-panel">
                 <h3 style="margin-bottom:10px; color:var(--text-main);" data-lang="full_details">פירוט מלא</h3>
-                <div style="overflow-x:auto">
-                    <table class="ssc-table">
-                        <thead><tr><th data-lang="col_type">סוג</th><th data-lang="col_qty">כמות</th><th data-lang="col_hours">שעות</th><th data-lang="col_total">סה״כ</th></tr></thead>
-                        <tbody id="ssc_details"></tbody>
-                        <tfoot><tr><td colspan="3" data-lang="grand_total">סה״כ כולל</td><td id="ssc_detailsTotal">0</td></tr></tfoot>
-                    </table>
-                </div>
+                <div style="overflow-x:auto"><table class="ssc-table"><thead><tr><th data-lang="col_type">סוג</th><th data-lang="col_qty">כמות</th><th data-lang="col_hours">שעות</th><th data-lang="col_total">סה״כ</th></tr></thead><tbody id="ssc_details"></tbody><tfoot><tr><td colspan="3" data-lang="grand_total">סה״כ כולל</td><td id="ssc_detailsTotal">0</td></tr></tfoot></table></div>
             </section>
         </div>
+        <div style="display:flex; justify-content:center; gap:5px; margin-top:20px; opacity:0.3;">
+            <input type="text" id="ssc_secretCode" class="ssc-inp" placeholder="קוד..." style="width:100px; text-align:center; padding:8px;">
+            <button class="ssc-btn" id="ssc_secretBtn" style="background:#999; color:white;">OK</button>
+        </div>
+        <div class="ad-spacer"></div>
+    </div>
+
+    <div id="page-loan" class="page">
+        <header class="app-header" style="padding-bottom: 20px;">
+            <div style="height:20px"></div>
+            <h2 data-lang="menu_loan">מחשבון הלוואה</h2>
+        </header>
+        <div class="tool-card">
+            <div class="tool-row"><label class="tool-label" data-lang="loan_amount">סכום ההלוואה</label><input type="number" id="loan-amount" class="tool-input"></div>
+            <div class="tool-row"><label class="tool-label" data-lang="loan_interest">ריבית שנתית (%)</label><input type="number" id="loan-rate" class="tool-input"></div>
+            <div class="tool-row"><label class="tool-label" data-lang="loan_years">תקופה (שנים)</label><input type="number" id="loan-years" class="tool-input"></div>
+            <button class="btn-primary" onclick="calcLoan()" data-lang="calculate">חשב</button>
+            <div class="tool-result">
+                <div style="font-size:0.9rem;" data-lang="monthly_payment">החזר חודשי</div>
+                <div class="tool-res-val" id="loan-result">---</div>
+            </div>
+        </div>
+        <div class="ad-spacer"></div>
+    </div>
+
+    <div id="page-split" class="page">
+        <header class="app-header" style="padding-bottom: 20px;">
+            <div style="height:20px"></div>
+            <h2 data-lang="menu_split">פיצול חשבון</h2>
+        </header>
+        <div class="tool-card">
+            <div class="tool-row"><label class="tool-label" data-lang="bill_amount">סכום החשבון</label><input type="number" id="split-amount" class="tool-input"></div>
+            <div class="tool-row"><label class="tool-label" data-lang="tip_percent">טיפ (%)</label><input type="number" id="split-tip" class="tool-input" value="10"></div>
+            <div class="tool-row"><label class="tool-label" data-lang="num_people">מספר אנשים</label><input type="number" id="split-people" class="tool-input" value="2"></div>
+            <button class="btn-primary" onclick="calcSplit()" data-lang="calculate">חשב</button>
+            <div class="tool-result">
+                <div style="font-size:0.9rem;" data-lang="total_per_person">סה״כ לאדם</div>
+                <div class="tool-res-val" id="split-result">---</div>
+            </div>
+        </div>
+        <div class="ad-spacer"></div>
+    </div>
+
+    <div id="page-wishlist" class="page">
+        <header class="app-header" style="padding-bottom: 20px;">
+            <div style="height:20px"></div>
+            <h2 data-lang="menu_wishlist">רשימת משאלות</h2>
+        </header>
+        <div class="recur-add-box">
+            <h3 style="margin-top:0; color:var(--primary); margin-bottom:15px;" data-lang="add_new">+ הוספה חדשה</h3>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="wish-name" class="qa-input" style="flex:2; min-width:0;" data-lang-placeholder="item_name" placeholder="שם מוצר">
+                <input type="number" id="wish-price" class="qa-input" style="flex:1; min-width:0;" data-lang-placeholder="item_price" placeholder="מחיר">
+            </div>
+            <button class="btn-primary" onclick="addWishlistItem()" style="width: 50%; margin: 10px auto; display: block;" data-lang="add">הוסף</button>
+        </div>
+        <div style="padding: 0 15px;" id="wishlist-container"></div>
         <div class="ad-spacer"></div>
     </div>
 
@@ -730,6 +658,15 @@
         </div>
     </div>
 
+    <div id="buy-item-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h3>בחר קטגוריה לחיוב</h3>
+            <input type="hidden" id="buy-item-index">
+            <select id="buy-cat-select" class="qa-input" style="width:100%; margin-bottom:15px;"></select>
+            <div style="display:flex; gap:10px;"><button class="btn-primary" style="background:#ccc; color:#333" onclick="document.getElementById('buy-item-modal').classList.remove('open')" data-lang="cancel">ביטול</button><button class="btn-primary" onclick="confirmBuyItem()" data-lang="confirm">בצע רכישה</button></div>
+        </div>
+    </div>
+
     <script>
         // === 1. GLOBAL VARS ===
         let currentCurrency = localStorage.getItem('appCurrency') || 'ILS';
@@ -744,17 +681,18 @@
 
         let appData = JSON.parse(localStorage.getItem('budgetUltimateDataV23')) || {
             categories: [{ id: 1, name: 'מזון', emoji: '🍕', limit: 2000, items: [] }, { id: 2, name: 'רכב', emoji: '🚗', limit: 800, items: [] }, { id: 3, name: 'חשבונות', emoji: '🏠', limit: 1500, items: [] }],
-            goals: [], bank: 0, monthlySalaries: {}, recurringSettings: [], lastProcessedMonth: "", lastLogin: Date.now(), isPremium: false
+            goals: [], bank: 0, monthlySalaries: {}, recurringSettings: [], wishlist: [], lastProcessedMonth: "", lastLogin: Date.now(), isPremium: false
         };
         if(!appData.recurringSettings) appData.recurringSettings = [];
+        if(!appData.wishlist) appData.wishlist = [];
 
         // === 2. DICTIONARIES ===
         const translations = {
             he: {
                 dir: 'rtl', locale: 'he-IL',
                 app_title: "Neto", subtitle: "ניהול תקציב חכם ופשוט", daily_tip: "טיפ יומי", start_btn: "בואו נתחיל",
-                menu_title: "תפריט", menu_home: "ראשי", menu_converter: "ממיר מטבעות", menu_recur: "הוצאות קבועות", menu_calc: "מחשבון שכר", menu_pro: "פרימיום", menu_backup: "גיבוי ושחזור", menu_dark: "מצב לילה", setup_pin: "הגדרת קוד נעילה",
-                balance_label: "עו\"ש בבנק", salary_label: "משכורת", filter_all: "כל הקטגוריות",
+                menu_title: "תפריט", menu_home: "ראשי", menu_converter: "ממיר מטבעות", menu_recur: "קבועות", menu_calc: "מחשבון שכר", menu_loan: "מחשבון הלוואה", menu_split: "פיצול חשבון", menu_wishlist: "רשימת משאלות", menu_pro: "פרימיום", menu_backup: "גיבוי ושחזור", menu_dark: "מצב לילה", setup_pin: "הגדרת קוד נעילה",
+                balance_label: "עו\"ש בבנק", salary_label: "משכורת", filter_all: "כל הקטגוריות", search_ph: "חיפוש הוצאות...",
                 savings_title: "קופות חיסכון", new_goal_btn: "+ יעד חדש", chart_toggle: "החלף תצוגה",
                 budget: "תקציב:", add: "הוסף", desc_placeholder: "תיאור", amount_placeholder: "סכום",
                 recur_title: "הוצאות קבועות", add_new: "+ הוספה חדשה", recur_name_ph: "שם (למשל: נטפליקס)", save_order: "שמור הוראה",
@@ -778,13 +716,16 @@
                 footer_rights: "© All rights reserved for Neto App , Developer: Cohen's.",
                 tips: ["הדרך לעושר מתחילה בשקל הראשון שחוסכים.", "לא משנה כמה אתה מרוויח, משנה כמה אתה שומר.", "תקציב הוא לא כלא, הוא המפתח לחופש.", "כסף הוא משרת נהדר אבל אדון נורא.", "השקעה בעצמך מניבה את הריבית הגבוהה ביותר.", "הוצאות קטנות מצטברות להון גדול.", "שליטה בכסף היא שליטה בחיים.", "העושר האמיתי הוא השקט הנפשי.", "אל תקנה מה שאתה לא צריך.", "תקציב חכם היום = חופש כלכלי מחר."],
                 pin_enter: "הזן קוד גישה", pin_setup: "בחר קוד גישה חדש", pin_confirm: "אמת קוד גישה", pin_wrong: "קוד שגוי", pin_match_err: "קוד לא תואם",
-                converter_title: "ממיר מטבעות", convert_btn: "המר כעת"
+                converter_title: "ממיר מטבעות", convert_btn: "המר כעת",
+                loan_amount: "סכום ההלוואה", loan_interest: "ריבית שנתית (%)", loan_years: "תקופה (שנים)", calculate: "חשב", monthly_payment: "החזר חודשי",
+                bill_amount: "סכום החשבון", tip_percent: "טיפ (%)", num_people: "מספר אנשים", total_per_person: "סה״כ לאדם",
+                item_name: "שם מוצר", item_price: "מחיר", no_items: "אין פריטים ברשימה"
             },
             en: {
                 dir: 'ltr', locale: 'en-US',
                 app_title: "Neto", subtitle: "Smart Budget Management", daily_tip: "Daily Tip", start_btn: "Let's Start",
-                menu_title: "Menu", menu_home: "Dashboard", menu_converter: "Currency Converter", menu_recur: "Recurring", menu_calc: "Salary Calc", menu_pro: "Premium", menu_backup: "Backup & Restore", menu_dark: "Dark Mode", setup_pin: "Setup PIN Lock",
-                balance_label: "Bank Balance", salary_label: "Salary", filter_all: "All Categories",
+                menu_title: "Menu", menu_home: "Dashboard", menu_converter: "Currency Converter", menu_recur: "Recurring", menu_calc: "Salary Calc", menu_loan: "Loan Calc", menu_split: "Split Bill", menu_wishlist: "Wishlist", menu_pro: "Premium", menu_backup: "Backup & Restore", menu_dark: "Dark Mode", setup_pin: "Setup PIN Lock",
+                balance_label: "Bank Balance", salary_label: "Salary", filter_all: "All Categories", search_ph: "Search expenses...",
                 savings_title: "Savings Goals", new_goal_btn: "+ New Goal", chart_toggle: "Toggle View",
                 budget: "Budget:", add: "Add", desc_placeholder: "Description", amount_placeholder: "Amount",
                 recur_title: "Recurring Expenses", add_new: "+ Add New", recur_name_ph: "Name (e.g. Netflix)", save_order: "Save Order",
@@ -808,27 +749,15 @@
                 footer_rights: "© All rights reserved for Neto App , Developer: Cohen's.",
                 tips: ["The road to wealth starts with the first coin saved.", "It's not how much you make, it's how much you keep.", "A budget is telling your money where to go instead of wondering where it went.", "Money is a terrible master but an excellent servant.", "Investing in yourself pays the best interest.", "Small expenses add up to a big fortune.", "Mastering money is mastering life.", "True wealth is peace of mind.", "Don't buy what you don't need.", "Smart budgeting today = Financial freedom tomorrow."],
                 pin_enter: "Enter PIN", pin_setup: "Choose New PIN", pin_confirm: "Confirm PIN", pin_wrong: "Wrong PIN", pin_match_err: "PINs do not match",
-                converter_title: "Currency Converter", convert_btn: "Convert"
+                converter_title: "Currency Converter", convert_btn: "Convert",
+                loan_amount: "Loan Amount", loan_interest: "Annual Interest (%)", loan_years: "Term (Years)", calculate: "Calculate", monthly_payment: "Monthly Payment",
+                bill_amount: "Bill Amount", tip_percent: "Tip (%)", num_people: "Number of People", total_per_person: "Total Per Person",
+                item_name: "Item Name", item_price: "Price", no_items: "No items in wishlist"
             }
         };
 
         const currencyNames = {
-            USD: { he: "דולר אמריקאי", en: "US Dollar" },
-            EUR: { he: "אירו", en: "Euro" },
-            ILS: { he: "שקל חדש", en: "Israeli Shekel" },
-            GBP: { he: "לירה שטרלינג", en: "British Pound" },
-            JPY: { he: "יין יפני", en: "Japanese Yen" },
-            AUD: { he: "דולר אוסטרלי", en: "Australian Dollar" },
-            CAD: { he: "דולר קנדי", en: "Canadian Dollar" },
-            CHF: { he: "פרנק שוויצרי", en: "Swiss Franc" },
-            CNY: { he: "יואן סיני", en: "Chinese Yuan" },
-            RUB: { he: "רובל רוסי", en: "Russian Ruble" },
-            BRL: { he: "ריאל ברזילאי", en: "Brazilian Real" },
-            INR: { he: "רופי הודי", en: "Indian Rupee" },
-            TRY: { he: "לירה טורקית", en: "Turkish Lira" },
-            ZAR: { he: "ראנד דרום אפריקאי", en: "South African Rand" },
-            EGP: { he: "לירה מצרית", en: "Egyptian Pound" },
-            JOD: { he: "דינר ירדני", en: "Jordanian Dinar" }
+            USD: { he: "דולר אמריקאי", en: "US Dollar" }, EUR: { he: "אירו", en: "Euro" }, ILS: { he: "שקל חדש", en: "Israeli Shekel" }, GBP: { he: "לירה שטרלינג", en: "British Pound" }, JPY: { he: "יין יפני", en: "Japanese Yen" }, AUD: { he: "דולר אוסטרלי", en: "Australian Dollar" }, CAD: { he: "דולר קנדי", en: "Canadian Dollar" }, CHF: { he: "פרנק שוויצרי", en: "Swiss Franc" }, CNY: { he: "יואן סיני", en: "Chinese Yuan" }, RUB: { he: "רובל רוסי", en: "Russian Ruble" }, BRL: { he: "ריאל ברזילאי", en: "Brazilian Real" }, INR: { he: "רופי הודי", en: "Indian Rupee" }, TRY: { he: "לירה טורקית", en: "Turkish Lira" }, ZAR: { he: "ראנד דרום אפריקאי", en: "South African Rand" }, EGP: { he: "לירה מצרית", en: "Egyptian Pound" }, JOD: { he: "דינר ירדני", en: "Jordanian Dinar" }
         };
 
         // === 3. CORE FUNCTIONS ===
@@ -837,11 +766,7 @@
         function formatMoney(n) {
             let loc = 'he-IL';
             if(translations[currentLang]) loc = translations[currentLang].locale;
-            return n.toLocaleString(loc, { 
-                style: 'currency', 
-                currency: currentCurrency, 
-                maximumFractionDigits: 0 
-            }); 
+            return n.toLocaleString(loc, { style: 'currency', currency: currentCurrency, maximumFractionDigits: 0 }); 
         }
 
         function setCurrency(code) {
@@ -856,41 +781,28 @@
                 if(typeof renderRecurringPage === "function") renderRecurringPage();
                 if(typeof renderSavings === "function") renderSavings();
                 if(document.getElementById('ssc_grid') && typeof initSalaryCalculator === "function") initSalaryCalculator();
+                if(typeof renderWishlist === "function") renderWishlist();
             }
         }
 
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('appLang', lang);
-            
             const dir = translations[lang].dir;
             document.documentElement.setAttribute('dir', dir);
-            
-            document.querySelectorAll('[data-lang]').forEach(el => {
-                const key = el.getAttribute('data-lang');
-                if(translations[lang][key]) el.innerText = translations[lang][key];
-            });
-            
-            document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
-                const key = el.getAttribute('data-lang-placeholder');
-                if(translations[lang][key]) el.placeholder = translations[lang][key];
-            });
-
+            document.querySelectorAll('[data-lang]').forEach(el => { const key = el.getAttribute('data-lang'); if(translations[lang][key]) el.innerText = translations[lang][key]; });
+            document.querySelectorAll('[data-lang-placeholder]').forEach(el => { const key = el.getAttribute('data-lang-placeholder'); if(translations[lang][key]) el.placeholder = translations[lang][key]; });
             const arrow = document.getElementById('start-arrow');
             if(arrow) arrow.className = dir === 'rtl' ? 'fas fa-arrow-left' : 'fas fa-arrow-right';
-
-            document.querySelectorAll('[data-lang-btn]').forEach(btn => {
-                btn.classList.remove('active');
-                if(btn.dataset.langBtn === lang) btn.classList.add('active');
-            });
-
+            document.querySelectorAll('[data-lang-btn]').forEach(btn => { btn.classList.remove('active'); if(btn.dataset.langBtn === lang) btn.classList.add('active'); });
             updateTip();
             if(typeof updateMonthDisplay === 'function') updateMonthDisplay();
             if(typeof renderApp === "function") renderApp();
             if(typeof renderRecurringPage === "function") renderRecurringPage();
             if(typeof renderSavings === "function") renderSavings();
-            if(typeof initConverter === "function") initConverter(); // Refresh currency names
+            if(typeof initConverter === "function") initConverter(); 
             if(document.getElementById('ssc_grid') && typeof initSalaryCalculator === "function") initSalaryCalculator();
+            if(typeof renderWishlist === "function") renderWishlist();
         }
 
         function updateTip() {
@@ -908,12 +820,10 @@
         let tempPin = "";
 
         function checkPinLock() {
-            // RELOAD PIN FRESH
-            pinCode = localStorage.getItem('appPin'); 
+            pinCode = localStorage.getItem('appPin');
             if(pinCode) {
                 document.getElementById('pin-lock-screen').classList.add('active');
                 document.getElementById('pin-title').innerText = t('pin_enter');
-                // Hide Cancel button in UNLOCK mode
                 document.getElementById('pin-cancel-btn').style.display = 'none';
                 pinInput = "";
                 updatePinDots();
@@ -929,7 +839,6 @@
             pinInput = "";
             document.getElementById('pin-lock-screen').classList.add('active');
             document.getElementById('pin-title').innerText = t('pin_setup');
-            // Show Cancel button in SETUP mode
             document.getElementById('pin-cancel-btn').style.display = 'block';
             updatePinDots();
         }
@@ -988,14 +897,13 @@
                     }
                 }
             } else {
-                // Unlock Mode logic
                 if(pinInput === pinCode) {
                     document.getElementById('pin-lock-screen').classList.remove('active');
                 } else {
                     shakeDots();
                     document.getElementById('pin-subtitle').innerText = t('pin_wrong');
                     pinInput = "";
-                    updatePinDots(); // Clear dots visually
+                    updatePinDots();
                 }
             }
         }
@@ -1006,67 +914,32 @@
             setTimeout(updatePinDots, 500);
         }
 
-        /* === 5. CONVERTER LOGIC === */
-        let ratesData = {};
+        /* === 5. NEW TOOLS LOGIC === */
         
+        // Converter
+        let ratesData = {};
         function initConverter() {
             fetch('https://api.exchangerate-api.com/v4/latest/USD')
                 .then(res => res.json())
                 .then(data => {
                     ratesData = data.rates;
-                    
-                    // רשימת כל המטבעות שהתקבלו מהאינטרנט
                     const apiKeys = Object.keys(ratesData);
-                    
                     const sel1 = document.getElementById('conv-from');
                     const sel2 = document.getElementById('conv-to');
                     if(!sel1 || !sel2) return;
-                    
-                    // שמירת הבחירה הנוכחית (כדי לא לאפס למשתמש כל רגע)
-                    const old1 = sel1.value;
-                    const old2 = sel2.value;
-
+                    const old1 = sel1.value; const old2 = sel2.value;
                     sel1.innerHTML = ''; sel2.innerHTML = '';
-                    
-                    // === הלוגיקה החדשה לסידור הרשימה ===
-                    
-                    // 1. קודם כל: המטבעות הנפוצים (אלו שיש להם שם במילון שלנו)
                     const popularList = Object.keys(currencyNames).filter(code => apiKeys.includes(code));
-                    
-                    // 2. אחר כך: כל שאר המטבעות (ממויינים לפי א-ב)
                     const otherList = apiKeys.filter(code => !currencyNames[code]).sort();
-                    
-                    // 3. איחוד הרשימות לרשימה אחת
                     const sortedList = [...popularList, ...otherList];
-
-                    // יצירת האפשרויות בתיבה
                     sortedList.forEach(cur => {
-                        // אם זה מטבע נפוץ - נציג שם יפה. אם לא - רק את הקוד
                         const label = currencyNames[cur] ? `${cur} - ${currencyNames[cur][currentLang]}` : cur;
-                        
-                        const opt1 = document.createElement('option'); 
-                        opt1.value = cur; 
-                        opt1.text = label;
-                        
-                        const opt2 = document.createElement('option'); 
-                        opt2.value = cur; 
-                        opt2.text = label;
-                        
-                        // הדגשה קטנה למטבעות הנפוצים (מודגש)
-                        if (currencyNames[cur]) {
-                            opt1.style.fontWeight = "bold";
-                            opt1.style.color = "var(--primary)"; // צבע כחול לנפוצים
-                            opt2.style.fontWeight = "bold";
-                            opt2.style.color = "var(--primary)";
-                        }
-
+                        const opt1 = document.createElement('option'); opt1.value = cur; opt1.text = label;
+                        const opt2 = document.createElement('option'); opt2.value = cur; opt2.text = label;
+                        if (currencyNames[cur]) { opt1.style.fontWeight = "bold"; opt1.style.color = "var(--primary)"; opt2.style.fontWeight = "bold"; opt2.style.color = "var(--primary)"; }
                         sel1.appendChild(opt1); sel2.appendChild(opt2);
                     });
-
-                    // שחזור בחירה או ברירת מחדל
-                    sel1.value = old1 || 'USD';
-                    sel2.value = old2 || 'ILS';
-                    
+                    sel1.value = old1 || 'USD'; sel2.value = old2 || 'ILS';
                     convertCurrency();
                 })
                 .catch(err => {
@@ -1075,52 +948,121 @@
                     if(resEl) resEl.innerText = 'Offline';
                 });
         }
-
         function convertCurrency() {
             if(!ratesData || Object.keys(ratesData).length === 0) return;
             const amount = parseFloat(document.getElementById('conv-amount').value) || 0;
             const from = document.getElementById('conv-from').value;
             const to = document.getElementById('conv-to').value;
-            
-            // Calc: (Amount / RateFrom) * RateTo
             const rateFrom = ratesData[from];
             const rateTo = ratesData[to];
             const res = (amount / rateFrom) * rateTo;
-            
             document.getElementById('conv-result-big').innerText = res.toFixed(2) + ' ' + to;
             document.getElementById('conv-result-sub').innerText = `1 ${from} = ${(rateTo/rateFrom).toFixed(4)} ${to}`;
         }
-
         function swapCurrencies() {
             const s1 = document.getElementById('conv-from');
             const s2 = document.getElementById('conv-to');
-            const tmp = s1.value;
-            s1.value = s2.value;
-            s2.value = tmp;
+            const tmp = s1.value; s1.value = s2.value; s2.value = tmp;
             convertCurrency();
         }
 
-        // === 6. STARTUP LOGIC (Fixed Order) ===
+        // Loan Calculator
+        function calcLoan() {
+            const amount = parseFloat(document.getElementById('loan-amount').value);
+            const rate = parseFloat(document.getElementById('loan-rate').value);
+            const years = parseFloat(document.getElementById('loan-years').value);
+            if(amount && rate && years) {
+                const r = rate / 100 / 12;
+                const n = years * 12;
+                const monthly = amount * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+                document.getElementById('loan-result').innerText = formatMoney(monthly);
+            }
+        }
+
+        // Split Bill
+        function calcSplit() {
+            const amount = parseFloat(document.getElementById('split-amount').value);
+            const tip = parseFloat(document.getElementById('split-tip').value);
+            const people = parseFloat(document.getElementById('split-people').value);
+            if(amount && people) {
+                const total = amount * (1 + tip/100);
+                const perPerson = total / people;
+                document.getElementById('split-result').innerText = formatMoney(perPerson);
+            }
+        }
+
+        // Wishlist
+        function renderWishlist() {
+            const container = document.getElementById('wishlist-container');
+            if(!container) return;
+            container.innerHTML = '';
+            if(!appData.wishlist || appData.wishlist.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:20px; opacity:0.6;">${t('no_items')}</div>`;
+                return;
+            }
+            appData.wishlist.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'wishlist-item';
+                div.innerHTML = `
+                    <div class="w-info">
+                        <div class="w-name">${item.name}</div>
+                        <div class="w-price">${formatMoney(item.price)}</div>
+                    </div>
+                    <div class="w-actions">
+                        <button class="w-btn buy" onclick="openBuyItemModal(${index})"><i class="fas fa-check"></i></button>
+                        <button class="w-btn del" onclick="deleteWishlistItem(${index})"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        function addWishlistItem() {
+            const name = document.getElementById('wish-name').value;
+            const price = parseFloat(document.getElementById('wish-price').value);
+            if(name && price) {
+                appData.wishlist.push({name, price});
+                saveData();
+                renderWishlist();
+                document.getElementById('wish-name').value = '';
+                document.getElementById('wish-price').value = '';
+            }
+        }
+        function deleteWishlistItem(index) {
+            appData.wishlist.splice(index, 1);
+            saveData();
+            renderWishlist();
+        }
+        function openBuyItemModal(index) {
+            document.getElementById('buy-item-index').value = index;
+            const select = document.getElementById('buy-cat-select');
+            select.innerHTML = appData.categories.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
+            document.getElementById('buy-item-modal').classList.add('open');
+        }
+        function confirmBuyItem() {
+            const index = parseInt(document.getElementById('buy-item-index').value);
+            const catId = document.getElementById('buy-cat-select').value;
+            const item = appData.wishlist[index];
+            const cat = appData.categories.find(c => c.id == catId);
+            if(cat && item) {
+                cat.items.push({ id: Date.now().toString(), text: item.name, amount: -Math.abs(item.price), date: currentDate.toISOString(), method: 'credit' });
+                appData.wishlist.splice(index, 1);
+                saveAndRender(); // Saves and refreshes dash
+                renderWishlist();
+                document.getElementById('buy-item-modal').classList.remove('open');
+                showAppAlert(t('alert_title'), 'Purchased!', '🛍️');
+            }
+        }
+
+        // === 6. STARTUP & MAIN LOGIC ===
         document.addEventListener('DOMContentLoaded', () => {
             if(isDarkMode) document.body.classList.add('dark-mode');
-            
-            // 1. First, check Lock (Security Priority) - this MUST run before anything visual updates
-            checkPinLock();
-
-            // 2. Set Language & Currency (Load UI Text)
+            checkPinLock(); // Security first
             setLanguage(currentLang);
             setCurrency(currentCurrency);
-
-            // 3. Load User Data
             document.getElementById('bank-input').value = appData.bank || '';
             
-            // 4. Init Components
-            checkAndRunRecurring(); 
-            updateMonthDisplay(); 
-            renderApp(); 
-            checkPremiumStatus(); 
-            initSalaryCalculator();
-            initConverter(); // New Page Init
+            checkAndRunRecurring(); updateMonthDisplay(); renderApp(); checkPremiumStatus(); 
+            initSalaryCalculator(); initConverter(); renderWishlist();
             
             appData.lastLogin = Date.now(); 
             saveData();
@@ -1143,6 +1085,7 @@
             
             if(pageName === 'dashboard') renderApp();
             if(pageName === 'recurring') renderRecurringPage();
+            if(pageName === 'wishlist') renderWishlist();
         }
 
         function getMonthKey(date) { return `${date.getMonth()}-${date.getFullYear()}`; }
@@ -1160,23 +1103,32 @@
 
             const container = document.getElementById('categories-container'); container.innerHTML = '';
             let totalExpenses = 0;
+            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
 
             appData.categories.forEach(cat => {
                 if(currentFilter !== 'all' && cat.id != currentFilter) return;
                 let filteredItems = cat.items.filter(item => { const d = new Date(item.date); return d.getMonth() === currentDate.getMonth() && d.getFullYear() === currentDate.getFullYear(); });
-                const catTotal = filteredItems.reduce((sum, item) => sum + item.amount, 0); totalExpenses += catTotal;
+                // Apply Search
+                if(searchTerm) {
+                    filteredItems = filteredItems.filter(item => item.text.toLowerCase().includes(searchTerm));
+                }
+
+                const catTotal = filteredItems.reduce((sum, item) => sum + item.amount, 0); 
+                // Only count total if no search or if search matches (Visual total)
+                if(!searchTerm) totalExpenses += catTotal;
+
+                // Don't show empty categories in search mode
+                if(searchTerm && filteredItems.length === 0) return;
+
                 const spentPos = Math.abs(Math.min(0, catTotal)); const limit = cat.limit || 1000; const percent = Math.min(100, (spentPos / limit) * 100);
                 let colorClass = percent > 100 ? 'bg-red' : (percent > 75 ? 'bg-yellow' : 'bg-green'); let balanceStyle = percent >= 100 ? 'color:var(--danger)' : '';
 
-                const card = document.createElement('div'); card.className = 'category-card';
-                card.setAttribute('data-id', cat.id); 
-                
+                const card = document.createElement('div'); card.className = 'category-card'; card.setAttribute('data-id', cat.id); 
                 const deleteBtnHtml = `<div class="cat-delete-main-btn" onclick="deleteCategoryMain(${cat.id})"><i class="fas fa-times"></i></div>`;
                 const dragHandleHtml = `<div class="drag-handle"><i class="fas fa-sort"></i></div>`;
 
                 card.innerHTML = `
-                    ${deleteBtnHtml}
-                    ${dragHandleHtml}
+                    ${deleteBtnHtml} ${dragHandleHtml}
                     <div class="card-header">
                         <div class="cat-info"><div class="cat-emoji">${cat.emoji}</div><div><div style="font-weight:bold">${cat.name}</div><div class="cat-limit" onclick="openLimitModal(${cat.id})">${t('budget')} ${limit} <i class="fas fa-pen" style="font-size:0.7rem"></i></div></div></div>
                         <div class="current-spend" style="${balanceStyle}">${formatMoney(catTotal)}</div>
@@ -1197,18 +1149,15 @@
             });
 
             if(categorySortable) categorySortable.destroy();
-            categorySortable = new Sortable(container, {
-                animation: 150, handle: '.drag-handle',
-                onEnd: function (evt) {
-                    const item = appData.categories.splice(evt.oldIndex, 1)[0];
-                    appData.categories.splice(evt.newIndex, 0, item);
-                    saveData();
-                }
-            });
+            categorySortable = new Sortable(container, { animation: 150, handle: '.drag-handle', onEnd: function (evt) { const item = appData.categories.splice(evt.oldIndex, 1)[0]; appData.categories.splice(evt.newIndex, 0, item); saveData(); } });
 
-            const bank = parseFloat(appData.bank) || 0; const salary = parseFloat(appData.monthlySalaries?.[key]) || 0; const total = bank + salary + totalExpenses;
-            document.getElementById('global-balance').innerText = formatMoney(total); document.getElementById('global-balance').style.color = total < 0 ? 'var(--danger)' : 'white';
-            renderHistoryChart(); renderSavings();
+            // Only update Global Balance if not searching (to avoid confusion)
+            if(!searchTerm) {
+                const bank = parseFloat(appData.bank) || 0; const salary = parseFloat(appData.monthlySalaries?.[key]) || 0; const total = bank + salary + totalExpenses;
+                document.getElementById('global-balance').innerText = formatMoney(total); document.getElementById('global-balance').style.color = total < 0 ? 'var(--danger)' : 'white';
+                renderHistoryChart();
+            }
+            renderSavings();
         }
 
         function deleteCategoryMain(id) { document.getElementById('delete-cat-target-id').value = id; document.getElementById('delete-category-modal').classList.add('open'); }
@@ -1292,20 +1241,58 @@
         function closeCustomAlert() { document.getElementById('custom-alert-modal').classList.remove('open'); if (postAlertAction) { postAlertAction(); postAlertAction = null; } }
 
         /* SSC Calculator */
+        /* SSC Calculator (עם תמיכה במצב משמר) */
         function initSalaryCalculator() {
             const $ = s => document.querySelector(s);
             const ymDefault = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}`;
-            const state = { mode: 'generic', hourly: 0, ym: ymDefault, categories: [], counts: {}, quickRows: [] };
+            
+            // הגדרת מצב (רגיל או משמר)
+            const currentMode = localStorage.getItem('ssc:mode') || 'generic';
+            
+            // נתוני משמרות מיוחדים (Hardcoded)
+            const MISHMAR_CATS = [ 
+                {id:'m1', name:'בוקר', slices:[{p:100,h:8}]}, 
+                {id:'m2', name:'צהריים', slices:[{p:120,h:8}]}, 
+                {id:'m3', name:'לילה', slices:[{p:150,h:8}]}, 
+                {id:'m4', name:'שישי צהריים', slices:[{p:120,h:3},{p:250,h:5}]}, 
+                {id:'m5', name:'שישי/שבת לילה', slices:[{p:300,h:8}]}, 
+                {id:'m6', name:'שבת בוקר/צהריים', slices:[{p:225,h:8}]}, 
+                {id:'m7', name:'רצף צהריים לבוקר', slices:[{p:125,h:2},{p:150,h:6}]}, 
+                {id:'m8', name:'רצף לילה לצהריים', slices:[{p:187,h:2},{p:225,h:6}]}, 
+                {id:'m9', name:'כפולה 7-19', slices:[{p:100,h:8},{p:120,h:2},{p:150,h:2}]}, 
+                {id:'m10', name:'כפולה 8-20', slices:[{p:100,h:7},{p:120,h:1},{p:125,h:2},{p:150,h:2}]}, 
+                {id:'m11', name:'כפולה 8-20', slices:[{p:100,h:6},{p:120,h:2},{p:125,h:2},{p:150,h:2}]}, 
+                {id:'m12', name:'חד יומי (06-21)', slices:[{p:100,h:8},{p:125,h:2},{p:150,h:5}]} 
+            ];
+
+            const state = { mode: currentMode, hourly: 0, ym: ymDefault, categories: [], counts: {}, quickRows: [] };
             const els = { hourly: $('#ssc_hourly'), month: $('#ssc_month'), grid: $('#ssc_grid'), tShifts: $('#ssc_totalShifts'), tHours: $('#ssc_totalHours'), gTotal: $('#ssc_grandTotal'), details: $('#ssc_details'), dTotal: $('#ssc_detailsTotal'), quick: $('#ssc_quickRows'), quickSum: $('#ssc_quickSum') };
             
-            try{ const cfg=JSON.parse(localStorage.getItem('ssc:cfg')||'{}'); state.hourly=cfg.hourly||0; els.hourly.value=state.hourly||''; els.month.value=state.ym; }catch(e){}
-            function loadData(){ 
-                try{state.categories=JSON.parse(localStorage.getItem('ssc:cats_generic')||'[]');}catch{state.categories=[];} 
-                if(!state.categories.length) state.categories=[{id:'g1',name:'משמרת רגילה',slices:[{p:100,h:8}]}]; 
-                const storeKey=`ssc:counts:generic:${state.ym}`; try{state.counts=JSON.parse(localStorage.getItem(storeKey)||'{}');}catch{state.counts={};} 
-                const quickKey=`ssc:quick:generic:${state.ym}`; try{state.quickRows=JSON.parse(localStorage.getItem(quickKey)||'[]');}catch{state.quickRows=[];}
+            // עדכון הכותרת לפי המצב
+            const badge = document.getElementById('ssc_modeBadge');
+            if(state.mode === 'mishmar') {
+                badge.innerText = "מצב משמר 👮‍♂️";
+                badge.style.background = "rgba(255, 215, 0, 0.3)"; // צבע זהב
+                document.getElementById('ssc_editorPanel').style.display = 'none'; // הסתרת עריכה
+            } else {
+                badge.innerText = t('mode_free');
+                badge.style.background = "rgba(255,255,255,0.2)";
+                document.getElementById('ssc_editorPanel').style.display = 'block';
             }
-            function saveData(){ localStorage.setItem('ssc:cfg', JSON.stringify({hourly:state.hourly})); localStorage.setItem(`ssc:counts:generic:${state.ym}`, JSON.stringify(state.counts)); localStorage.setItem(`ssc:quick:generic:${state.ym}`, JSON.stringify(state.quickRows)); localStorage.setItem('ssc:cats_generic', JSON.stringify(state.categories)); }
+
+            try{ const cfg=JSON.parse(localStorage.getItem('ssc:cfg')||'{}'); state.hourly=cfg.hourly||0; els.hourly.value=state.hourly||''; els.month.value=state.ym; }catch(e){}
+            
+            function loadData(){ 
+                if(state.mode === 'mishmar') {
+                    state.categories = MISHMAR_CATS;
+                } else {
+                    try{state.categories=JSON.parse(localStorage.getItem('ssc:cats_generic')||'[]');}catch{state.categories=[];} 
+                    if(!state.categories.length) state.categories=[{id:'g1',name:'משמרת רגילה',slices:[{p:100,h:8}]}]; 
+                }
+                const storeKey=`ssc:counts:${state.mode}:${state.ym}`; try{state.counts=JSON.parse(localStorage.getItem(storeKey)||'{}');}catch{state.counts={};} 
+                const quickKey=`ssc:quick:${state.mode}:${state.ym}`; try{state.quickRows=JSON.parse(localStorage.getItem(quickKey)||'[]');}catch{state.quickRows=[];}
+            }
+            function saveData(){ localStorage.setItem('ssc:cfg', JSON.stringify({hourly:state.hourly})); localStorage.setItem(`ssc:counts:${state.mode}:${state.ym}`, JSON.stringify(state.counts)); localStorage.setItem(`ssc:quick:${state.mode}:${state.ym}`, JSON.stringify(state.quickRows)); if(state.mode==='generic') localStorage.setItem('ssc:cats_generic', JSON.stringify(state.categories)); }
             
             function renderAll(){ 
                 els.grid.innerHTML=''; 
@@ -1314,7 +1301,9 @@
                 state.categories.forEach(c=>{ 
                     const n=state.counts[c.id]||0; const subtotal=payForShift(c)*n; 
                     const card=document.createElement('div'); card.className='ssc-card'; 
-                    card.innerHTML=`<button class="ssc-del-cat" onclick="sscDeleteCategory('${c.id}')"><i class="fas fa-times"></i></button><h3>${c.name}</h3><div class="ssc-meta">${getShiftInfo(c).desc}</div><div class="ssc-counter"><div class="ssc-iconbtn" onclick="sscUpdateCount('${c.id}', -1)">−</div><div class="ssc-count">${n}</div><div class="ssc-iconbtn" onclick="sscUpdateCount('${c.id}', 1)">+</div></div><div class="ssc-meta" style="text-align:end">${t('col_total')}: <b>${fmt(subtotal)}</b></div>`; 
+                    // כפתור מחיקה רק במצב רגיל
+                    const delBtn = state.mode === 'generic' ? `<button class="ssc-del-cat" onclick="sscDeleteCategory('${c.id}')"><i class="fas fa-times"></i></button>` : '';
+                    card.innerHTML=`${delBtn}<h3>${c.name}</h3><div class="ssc-meta">${getShiftInfo(c).desc}</div><div class="ssc-counter"><div class="ssc-iconbtn" onclick="sscUpdateCount('${c.id}', -1)">−</div><div class="ssc-count">${n}</div><div class="ssc-iconbtn" onclick="sscUpdateCount('${c.id}', 1)">+</div></div><div class="ssc-meta" style="text-align:end">${t('col_total')}: <b>${fmt(subtotal)}</b></div>`; 
                     els.grid.appendChild(card); 
                 });
                 renderQuick(); calcAndRenderTotals();
@@ -1335,8 +1324,6 @@
             }
             function getShiftInfo(c){ let h=0; const parts=c.slices.map(s=>{ h+=+s.h; return `${s.p}%×${s.h}h`; }); return {totalHours:h, desc:`${h}h (${parts.join(' + ')})`}; }
             function payForShift(c){ if(!state.hourly)return 0; return c.slices.reduce((sum,s)=>sum+(state.hourly*(s.p/100)*s.h),0); }
-            
-            // FIX: Use global formatMoney
             function fmt(n){ return formatMoney(n); }
 
             loadData(); renderAll();
@@ -1354,10 +1341,25 @@
             els.month.onchange=()=>{ state.ym=els.month.value; loadData(); renderAll(); };
             $('#ssc_saveTemplateBtn').onclick=()=>{ const name=$('#ssc_newShiftName').value.trim(); const slices=[]; document.querySelectorAll('#ssc_newShiftSlices .ssc-editor-slice').forEach(div=>{ slices.push({p:+div.querySelector('.e-p').value, h:+div.querySelector('.e-h').value}); }); if(name && slices.length){ state.categories.push({id:'g'+Date.now(),name,slices}); saveData(); renderAll(); $('#ssc_newShiftName').value=''; $('#ssc_newShiftSlices').innerHTML=''; window.sscAddEditorSlice(); } };
         }
+
+        // === מאזין לקוד הסודי (Global Event Listener) ===
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'ssc_secretBtn') {
+                const input = document.getElementById('ssc_secretCode');
+                if (!input) return;
+                const val = input.value.trim();
+                
+                if (val === 'משמר') {
+                    localStorage.setItem('ssc:mode', 'mishmar');
+                    showAppAlert('מצב משמר', 'הפרופיל נטען בהצלחה! מרענן...', '👮‍♂️', function() { location.reload(); });
+                } else if (val === 'רגיל' || val === 'generic') {
+                    localStorage.setItem('ssc:mode', 'generic');
+                    showAppAlert('מצב רגיל', 'חזרת למצב עריכה חופשי.', '✏️', function() { location.reload(); });
+                } else {
+                    showAppAlert('שגיאה', 'קוד לא חוקי', '❌');
+                }
+            }
+        });
     </script>
 </body>
 </html>
-
-
-
-

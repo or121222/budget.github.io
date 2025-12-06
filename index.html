@@ -343,7 +343,7 @@
         
         <div class="menu-divider" style="height:1px;background:rgba(0,0,0,0.1);margin:5px 0;"></div>
         
-        <div class="menu-item" onclick="openSettingsModal()"><i class="fas fa-cog"></i> <span data-lang="menu_backup">גיבוי והגדרות</span></div>
+        <div class="menu-item" onclick="openSettingsModal()"><i class="fas fa-cog"></i> <span data-lang="menu_backup">הגדרות</span></div>
         <div class="menu-item" onclick="toggleDarkMode()"><i class="fas fa-moon"></i> <span data-lang="menu_dark">מצב לילה</span></div>
         <div class="menu-item" onclick="setupPinCode()"><i class="fas fa-lock"></i> <span data-lang="setup_pin">הגדרת קוד נעילה</span></div>
         <div class="menu-item" onclick="removePinCode()"><i class="fas fa-unlock"></i> <span data-lang="remove_pin">הסר קוד נעילה</span></div>
@@ -600,7 +600,7 @@
 
     <div id="settings-modal" class="modal-overlay">
         <div class="modal-card">
-            <h3 data-lang="settings_title">הגדרות וגיבוי</h3>
+            <h3 data-lang="settings_title">הגדרות</h3>
             
             <div style="text-align:start; margin-bottom:5px; font-size:0.9rem; font-weight:bold; color:var(--text-sec);">ערכת נושא</div>
             <div class="theme-grid">
@@ -829,7 +829,7 @@
             he: {
                 dir: 'rtl', locale: 'he-IL', remove_pin: "הסר קוד נעילה",
                 app_title: "Neto", subtitle: "ניהול תקציב חכם ופשוט", daily_tip: "טיפ יומי", start_btn: "בואו נתחיל",
-                menu_title: "תפריט", menu_home: "ראשי", menu_converter: "ממיר מטבעות", menu_recur: "הוצאות קבועות", menu_calc: "מחשבון שכר", menu_loan: "מחשבון הלוואה", menu_split: "פיצול חשבון", menu_wishlist: "רשימת משאלות", menu_pro: "פרימיום", menu_backup: "גיבוי ושחזור", menu_dark: "מצב לילה", setup_pin: "הגדרת קוד נעילה",
+                menu_title: "תפריט", menu_home: "ראשי", menu_converter: "ממיר מטבעות", menu_recur: "הוצאות קבועות", menu_calc: "מחשבון שכר", menu_loan: "מחשבון הלוואה", menu_split: "פיצול חשבון", menu_wishlist: "רשימת משאלות", menu_pro: "פרימיום", menu_backup: "הגדרות", menu_dark: "מצב לילה", setup_pin: "הגדרת קוד נעילה",
                 balance_label: "עו\"ש בבנק", salary_label: "משכורת", filter_all: "כל הקטגוריות", search_ph: "חיפוש הוצאות...", left_to_spend: "נותר לבזבוז:",
                 savings_title: "קופות חיסכון", new_goal_btn: "+ יעד חדש", chart_toggle: "החלף תצוגה",
                 budget: "תקציב:", add: "הוסף", desc_placeholder: "תיאור", amount_placeholder: "סכום",
@@ -864,7 +864,7 @@
             en: {
                 dir: 'ltr', locale: 'en-US', remove_pin: "Remove PIN Lock",
                 app_title: "Neto", subtitle: "Smart Budget Management", daily_tip: "Daily Tip", start_btn: "Let's Start",
-                menu_title: "Menu", menu_home: "Dashboard", menu_converter: "Currency Converter", menu_recur: "Recurring Expenses", menu_calc: "Salary Calc", menu_loan: "Loan Calc", menu_split: "Split Bill", menu_wishlist: "Wishlist", menu_pro: "Premium", menu_backup: "Backup & Restore", menu_dark: "Dark Mode", setup_pin: "Setup PIN Lock",
+                menu_title: "Menu", menu_home: "Dashboard", menu_converter: "Currency Converter", menu_recur: "Recurring Expenses", menu_calc: "Salary Calc", menu_loan: "Loan Calc", menu_split: "Split Bill", menu_wishlist: "Wishlist", menu_pro: "Premium", menu_backup: "Settings", menu_dark: "Dark Mode", setup_pin: "Setup PIN Lock",
                 balance_label: "Bank Balance", salary_label: "Salary", filter_all: "All Categories", search_ph: "Search expenses...", left_to_spend: "Left to Spend:",
                 savings_title: "Savings Goals", new_goal_btn: "+ New Goal", chart_toggle: "Toggle View",
                 budget: "Budget:", add: "Add", desc_placeholder: "Description", amount_placeholder: "Amount",
@@ -875,7 +875,7 @@
                 no_shifts: "No shifts defined", stat_shifts: "Shifts", stat_hours: "Hours", stat_wage: "Salary",
                 free_calc_title: "Free Calculator (Additions)", col_desc: "Desc", col_hours: "Hours", col_percent: "Percent %", add_row: "+ Add Row", total_additions: "Total Additions:",
                 full_details: "Full Details", col_type: "Type", col_qty: "Qty", col_total: "Total", grand_total: "Grand Total",
-                settings_title: "Settings & Backup", backup_btn: "Full Backup (Share)", restore_btn: "Restore from Backup", export_btn: "Export to CSV (Share)", close: "Close",
+                settings_title: "Settings", backup_btn: "Full Backup (Share)", restore_btn: "Restore from Backup", export_btn: "Export to CSV (Share)", close: "Close",
                 delete_cat_title: "Delete Category?", delete_cat_msg: "Category and all expenses will be deleted.\nCannot be undone!", cancel: "Cancel", yes_delete: "Yes, Delete",
                 new_goal_title: "New Savings Goal", goal_name_ph: "Goal Name", goal_target_ph: "Target Amount", choose_color: "Choose Color:", save: "Save",
                 deposit_title: "Deposit to Goal", deposit_amount_ph: "Deposit Amount", deposit_btn: "Deposit",
@@ -1296,5 +1296,6 @@ async function exportToCSV() {
     </script>
 </body>
 </html>
+
 
 

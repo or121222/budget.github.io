@@ -502,11 +502,17 @@
         <div class="ad-spacer"></div>
     </div>
 
-    <div id="page-wishlist" class="page">
+   <div id="page-wishlist" class="page">
         <header class="app-header" style="padding-bottom: 20px;">
             <div style="height:20px"></div>
             <h2 data-lang="menu_wishlist">רשימת משאלות</h2>
+            
+            <div class="motivation-box1" style="margin-top: 15px;">
+                <i class="fas fa-star" style="margin-left:5px; opacity:0.8"></i>
+                <span class="motivation-text" style="font-weight:bold;">לפני שקונים - חושבים פעמיים! 💭</span> 
+            </div>
         </header>
+        
         <div class="recur-add-box">
             <h3 style="margin-top:0; color:var(--primary); margin-bottom:15px;" data-lang="add_new">+ הוספה חדשה</h3>
             <div style="display:flex; gap:5px;">
@@ -690,6 +696,7 @@
         const translations = {
             he: {
                 dir: 'rtl', locale: 'he-IL',
+                wishlist_tip: "לפני שקונים - חושבים פעמיים! 💭",
                 app_title: "Neto", subtitle: "ניהול תקציב חכם ופשוט", daily_tip: "טיפ יומי", start_btn: "בואו נתחיל",
                 menu_title: "תפריט", menu_home: "ראשי", menu_converter: "ממיר מטבעות", menu_recur: "קבועות", menu_calc: "מחשבון שכר", menu_loan: "מחשבון הלוואה", menu_split: "פיצול חשבון", menu_wishlist: "רשימת משאלות", menu_pro: "פרימיום", menu_backup: "גיבוי ושחזור", menu_dark: "מצב לילה", setup_pin: "הגדרת קוד נעילה",
                 balance_label: "עו\"ש בבנק", salary_label: "משכורת", filter_all: "כל הקטגוריות", search_ph: "חיפוש הוצאות...",
@@ -723,6 +730,7 @@
             },
             en: {
                 dir: 'ltr', locale: 'en-US',
+                wishlist_tip: "Think twice before buying! 💭",
                 app_title: "Neto", subtitle: "Smart Budget Management", daily_tip: "Daily Tip", start_btn: "Let's Start",
                 menu_title: "Menu", menu_home: "Dashboard", menu_converter: "Currency Converter", menu_recur: "Recurring", menu_calc: "Salary Calc", menu_loan: "Loan Calc", menu_split: "Split Bill", menu_wishlist: "Wishlist", menu_pro: "Premium", menu_backup: "Backup & Restore", menu_dark: "Dark Mode", setup_pin: "Setup PIN Lock",
                 balance_label: "Bank Balance", salary_label: "Salary", filter_all: "All Categories", search_ph: "Search expenses...",
@@ -1363,3 +1371,4 @@
     </script>
 </body>
 </html>
+

@@ -630,7 +630,9 @@
 
             <button class="btn-primary" onclick="exportDataJSON()" style="margin-bottom:10px; background:var(--primary)"><i class="fas fa-share-alt"></i> <span data-lang="backup_btn">גיבוי מלא (שתף)</span></button>
             <label class="btn-primary" style="background:var(--secondary); display:block; cursor:pointer; margin-bottom:10px"><i class="fas fa-file-import"></i> <span data-lang="restore_btn">שחזור מגיבוי</span><input type="file" onchange="importDataJSON(this)" style="display:none"></label>
-            <button class="btn-primary" onclick="()" style="margin-bottom:10px; background:var(--success)"><i class="fas fa-file-csv"></i> <span data-lang="export_btn">ייצוא לאקסל (שתף)</span></button>
+<button class="btn-primary" onclick="exportToCSV()" style="margin-bottom:10px; background:var(--success)">
+    <i class="fas fa-file-csv"></i> <span data-lang="export_btn">ייצוא לאקסל (שתף)</span>
+</button>
             <button class="btn-primary" style="background:#ccc; color:#333; margin-top:10px" onclick="toggleMenu(); document.getElementById('settings-modal').classList.remove('open')" data-lang="close">סגור</button>
         </div>
     </div>
@@ -1296,6 +1298,7 @@ async function exportToCSV() {
     </script>
 </body>
 </html>
+
 
 
 

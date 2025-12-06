@@ -1175,7 +1175,23 @@ function setCurrency(code) {
         function deleteItem(catId, itemId) { triggerHaptic(); const cat = appData.categories.find(c => c.id === catId); if(!cat) return; const item = cat.items.find(i => i.id === itemId); if(item && item.fromRecurId && appData.recurringSettings) { appData.recurringSettings = appData.recurringSettings.filter(rec => rec.id !== item.fromRecurId); saveData(); } cat.items = cat.items.filter(i => i.id !== itemId); saveAndRender(); }
         function duplicateItem(catId, itemId) { triggerHaptic(); const cat = appData.categories.find(c => c.id === catId); if(!cat) return; const item = cat.items.find(i => i.id === itemId); if(!item) return; const newItem = { ...item, id: Date.now().toString(), date: currentDate.toISOString(), isAuto: false, fromRecurId: null }; cat.items.push(newItem); saveAndRender(); showAppAlert(t('alert_title'), 'Item Duplicated', '📄'); }
         function openSettingsModal() { toggleMenu(); document.getElementById('settings-modal').classList.add('open'); }
-        async function exportDataJSON() { const dataStr = JSON.stringify(appData); const file = new File([dataStr], 'budget_backup.json', { type: 'application/json' }); if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: 'Backup' }); } catch(err) {} } else { const a = document.createElement('a'); a.href = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr); a.download = 'budget_backup.json'; a.click(); } }
+        async function exportDataJSON() {
+    const dataStr = JSON.stringify(appData);
+    const fileName = 'budget_backup.json';
+
+    // בדיקה אם אנחנו באפליקציה
+    if (typeof Android !== "undefined" && Android.saveFile) {
+        Android.saveFile(dataStr, fileName, "application/json");
+    } else {
+        // קוד להורדה במחשב/דפדפן רגיל...
+        const blob = new Blob([dataStr], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+    }
+}
         async function exportToCSV() { let csv = "\uFEFFDate,Category,Desc,Amount,Method\n"; appData.categories.forEach(cat => { cat.items.forEach(i => { csv += `${new Date(i.date).toLocaleDateString()},${cat.name},${i.text},${i.amount},${i.method}\n` }); }); const file = new File([csv], 'export.csv', { type: 'text/csv' }); if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: 'Export' }); } catch(err) {} } else { const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,'+ encodeURIComponent(csv); a.download = 'export.csv'; a.click(); } }
         function importDataJSON(input) { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const loadedData = JSON.parse(e.target.result); if(loadedData.categories) { appData = loadedData; saveData(); location.reload(); } } catch(err) { alert("Error"); } }; reader.readAsText(file); }
         function changeMonth(delta) { triggerHaptic(); currentDate.setMonth(currentDate.getMonth() + delta); updateMonthDisplay(); renderApp(); }
@@ -1254,3 +1270,4 @@ function setCurrency(code) {
     </script>
 </body>
 </html>
+

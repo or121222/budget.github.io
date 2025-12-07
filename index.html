@@ -780,6 +780,9 @@
         let currentCurrency = localStorage.getItem('appCurrency') || 'ILS';
         let currentLang = localStorage.getItem('appLang') || 'he';
         let pinCode = localStorage.getItem('appPin') || null;
+let pinInput = "";
+let pinSetupMode = false; // <--- הנה המשתנה שהיה חסר לך
+let tempPin = "";
         let currentDate = new Date();
         let isDarkMode = localStorage.getItem('darkMode') === 'true';
         let chartInstance = null;
@@ -941,6 +944,17 @@ function checkPinLock() {
             }
             return false; // מחזיר 'שקר' - האפליקציה פתוחה
         }
+        function setupPinCode() { toggleMenu(); pinSetupMode = true; tempPin = ""; pinInput = ""; document.getElementById('pin-lock-screen').classList.add('active'); document.getElementById('pin-title').innerText = t('pin_setup'); document.getElementById('pin-cancel-btn').style.display = 'block'; updatePinDots(); }
+        function removePinCode() { if (!localStorage.getItem('appPin')) { showAppAlert(t('alert_title'), 'לא מוגדר קוד נעילה', '⚠️'); toggleMenu(); return; } showConfirmDialog("הסרת נעילה", "האם אתה בטוח שברצונך להסיר את קוד הנעילה?", function() { localStorage.removeItem('appPin'); pinCode = null; toggleMenu(); showAppAlert(t('alert_title'), 'קוד הנעילה הוסר בהצלחה', '🔓'); }); }
+        function cancelPinSetup() { pinSetupMode = false; tempPin = ""; pinInput = ""; document.getElementById('pin-lock-screen').classList.remove('active'); }
+        function pressPin(num) { triggerHaptic(); if(pinInput.length < 4) { pinInput += num; updatePinDots(); if(pinInput.length === 4) setTimeout(handlePinSubmit, 200); } }
+function cancelPinSetup() { pinSetupMode = false; tempPin = ""; pinInput = ""; document.getElementById('pin-lock-screen').classList.remove('active'); }
+        function pressPin(num) { triggerHaptic(); if(pinInput.length < 4) { pinInput += num; updatePinDots(); if(pinInput.length === 4) setTimeout(handlePinSubmit, 200); } }
+        function deletePin() { triggerHaptic(); pinInput = pinInput.slice(0, -1); updatePinDots(); }
+        function updatePinDots() { const dots = document.querySelectorAll('.pin-dot'); dots.forEach((dot, i) => { if(i < pinInput.length) dot.classList.add('filled'); else dot.classList.remove('filled'); dot.classList.remove('error'); }); }
+        function handlePinSubmit() { if(pinSetupMode) { if(!tempPin) { tempPin = pinInput; pinInput = ""; document.getElementById('pin-title').innerText = t('pin_confirm'); updatePinDots(); } else { if(pinInput === tempPin) { pinCode = pinInput; localStorage.setItem('appPin', pinCode); pinSetupMode = false; document.getElementById('pin-lock-screen').classList.remove('active'); showAppAlert(t('alert_title'), 'PIN Set Successfully!', '🔒'); } else { shakeDots(); document.getElementById('pin-subtitle').innerText = t('pin_match_err'); pinInput = ""; tempPin = ""; setTimeout(() => { document.getElementById('pin-title').innerText = t('pin_setup'); document.getElementById('pin-subtitle').innerText = ""; }, 1000); } } } else { if(pinInput === pinCode) { document.getElementById('pin-lock-screen').classList.remove('active'); } else { shakeDots(); document.getElementById('pin-subtitle').innerText = t('pin_wrong'); pinInput = ""; updatePinDots(); } } }
+        function shakeDots() { if(appData.settings.haptics && navigator.vibrate) navigator.vibrate([50,50,50]); const dots = document.querySelectorAll('.pin-dot'); dots.forEach(dot => dot.classList.add('error')); setTimeout(updatePinDots, 500); }
+
         function triggerHaptic() { if(appData.settings.haptics && navigator.vibrate) navigator.vibrate(10); }
         
         function saveData() { localStorage.setItem('budgetUltimateDataV23', JSON.stringify(appData)); }
@@ -1157,6 +1171,7 @@ function setCurrency(code) {
 
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); document.getElementById('menu-overlay').classList.toggle('open'); document.body.classList.toggle('no-scroll'); }
         function navTo(pageName) { triggerHaptic(); if(document.getElementById('side-menu').classList.contains('open')) toggleMenu(); if (pageName === 'dashboard') document.getElementById('page-landing').classList.remove('active'); document.querySelectorAll('.page').forEach(el => el.classList.remove('active')); document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active')); document.getElementById(`page-${pageName}`).classList.add('active'); if(pageName === 'dashboard') renderApp(); if(pageName === 'recurring') renderRecurringPage(); if(pageName === 'wishlist') renderWishlist(); }
+
         function getMonthKey(date) { return `${date.getMonth()}-${date.getFullYear()}`; }
         function updateSalary() { const val = document.getElementById('salary-input').value; const key = getMonthKey(currentDate); if (!appData.monthlySalaries) appData.monthlySalaries = {}; appData.monthlySalaries[key] = val; saveAndRender(); }
         function saveAndRender() { appData.bank = document.getElementById('bank-input').value; saveData(); renderApp(); }
@@ -1332,8 +1347,3 @@ function renderRecurringPage() {
     </script>
 </body>
 </html>
-
-
-
-
-

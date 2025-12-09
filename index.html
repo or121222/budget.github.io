@@ -1345,5 +1345,413 @@ function renderRecurringPage() {
             }
         });
     </script>
+
+<!-- === Attendance Module v4 – נקי, יפה, מתאים לנייד, עם עריכת אחוזים === -->
+<style>
+#page-attendance { direction: rtl; padding-bottom: 100px; background: var(--bg-color); }
+.att-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 20px; border-radius: 0 0 30px 30px; text-align: center; margin-bottom: 20px; }
+.att-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
+.att-subtitle { opacity: 0.9; font-size: 0.95rem; }
+
+.att-card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin: 15px; box-shadow: var(--shadow); border: var(--glass-border); backdrop-filter: blur(10px); }
+
+.att-timer-box { text-align: center; padding: 25px 0; }
+.att-timer { font-size: 3.5rem; font-weight: 800; letter-spacing: 3px; color: var(--primary); }
+.att-earned { font-size: 2rem; font-weight: bold; color: var(--success); margin: 10px 0; }
+.att-hourly-input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); font-size: 1.1rem; text-align: center; margin: 15px 0; }
+
+.att-big-btn { width: 100%; padding: 16px; border-radius: 16px; font-size: 1.3rem; font-weight: bold; border: none; cursor: pointer; margin: 8px 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.att-start-btn { background: var(--success); color: white; }
+.att-stop-btn { background: var(--danger); color: white; }
+
+.att-manual-btn { background: rgba(0,0,0,0.05); color: var(--text-main); }
+
+.att-summary-card { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(0,0,0,0.03); border-radius: 16px; margin: 20px 15px; }
+.att-total-label { font-weight: bold; font-size: 1.1rem; }
+.att-total-amount { font-size: 1.8rem; font-weight: 800; color: var(--success); }
+
+.att-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95rem; }
+.att-table th { background: rgba(78,84,200,0.1); padding: 12px; text-align: center; font-weight: 600; color: var(--primary); }
+.att-table td { padding: 12px 8px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.05); }
+.att-row { background: var(--card-bg); margin-bottom: 10px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.att-row-date { font-weight: bold; font-size: 1.1rem; }
+.att-row-time { font-size: 0.9rem; color: var(--text-sec); }
+.att-row-earned { font-weight: bold; color: var(--success); }
+.att-edit-panel { background: rgba(0,0,0,0.03); padding: 15px; border-radius: 12px; margin: 10px 0; display: none; }
+.att-tier-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; }
+.att-tier-label { font-weight: 600; }
+.att-tier-input { width: 90px; padding: 8px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); text-align: center; }
+
+@media (max-width: 480px) {
+    .att-timer { font-size: 2.8rem; }
+    .att-earned { font-size: 1.6rem; }
+    .att-table th { font-size: 0.85rem; padding: 8px 4px; }
+}
+</style>
+
+<script>
+(function() {
+    const H = {
+        title: 'שעון נוכחות',
+        hourly: 'שכר לשעה (₪)',
+        start: 'התחל משמרת',
+        stop: 'עצור משמרת',
+        add_manual: 'הוסף משמרת ידנית',
+        clear: 'נקה הכל',
+        month_total: 'סה"כ החודש',
+        no_shifts: 'אין משמרות עדיין',
+        confirm_clear: 'למחוק את כל הרשומות של החודש?',
+        export: 'ייצוא CSV',
+        edit_hours: 'עריכת אחוזים',
+        save: 'שמור',
+        cancel: 'ביטול'
+    };
+
+    const TIERS = [100, 120, 125, 150, 175, 200, 225, 250, 300];
+
+    // הוספת פריט לתפריט
+    const menuItem = document.createElement('div');
+    menuItem.className = 'menu-item';
+    menuItem.onclick = () => navTo('attendance');
+    menuItem.innerHTML = `<i class="fas fa-clock"></i> <span>${H.title}</span>`;
+    const premiumItem = document.querySelector('.menu-item[onclick*="premium"]');
+    if (premiumItem && premiumItem.parentNode) {
+        premiumItem.parentNode.insertBefore(menuItem, premiumItem);
+    }
+
+    // יצירת העמוד
+    if (!document.getElementById('page-attendance')) {
+        const page = document.createElement('div');
+        page.id = 'page-attendance';
+        page.className = 'page';
+        page.innerHTML = `
+            <div class="att-header">
+                <div class="att-title">${H.title}</div>
+                <div class="att-subtitle">מעקב שעות עבודה מדויק</div>
+            </div>
+
+            <div class="att-card">
+                <input type="number" id="att_hourly" class="att-hourly-input" placeholder="${H.hourly}" step="0.01">
+                
+                <div class="att-timer-box">
+                    <div class="att-timer" id="att_timer">00:00:00</div>
+                    <div class="att-earned" id="att_earned">₪0.00</div>
+                </div>
+
+                <button id="att_toggle" class="att-big-btn att-start-btn">
+                    <i class="fas fa-play"></i> ${H.start}
+                </button>
+
+                 </div>
+
+            <div class="att-summary-card">
+                <div class="att-total-label">${H.month_total}</div>
+                <div id="att_month_total" class="att-total-amount">₪0.00</div>
+            </div>
+
+            <div style="margin: 0 15px;">
+                <button id="att_export" style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:bold; margin-bottom:10px;">
+                    <i class="fas fa-download"></i> ${H.export}
+                </button>
+                <button id="att_clear" style="width:100%; padding:12px; background:rgba(255,118,117,0.15); color:var(--danger); border:none; border-radius:12px; font-weight:bold;">
+                    <i class="fas fa-trash"></i> ${H.clear}
+                </button>
+            </div>
+
+            <div id="att_list" style="margin-top:20px;"></div>
+        `;
+        document.body.appendChild(page);
+    }
+
+    let running = false, startTime = null, timerInterval = null;
+    const STORAGE_KEY = 'attendance_running_v4';
+    const DATA_KEY = 'budgetUltimateDataV23';
+
+    function loadData() {
+        try {
+            const data = localStorage.getItem(DATA_KEY);
+            window.appData = data ? JSON.parse(data) : {};
+            if (!window.appData.attendance) window.appData.attendance = [];
+        } catch(e) { window.appData = { attendance: [] }; }
+    }
+
+    function saveData() {
+        try { localStorage.setItem(DATA_KEY, JSON.stringify(window.appData)); } catch(e) {}
+    }
+
+    function loadRunState() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            const s = JSON.parse(saved);
+            if (s.running && s.startTime) {
+                running = true;
+                startTime = s.startTime;
+            }
+        }
+    }
+
+    function saveRunState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ running, startTime }));
+    }
+
+    function clearRunState() {
+        localStorage.removeItem(STORAGE_KEY);
+    }
+
+    function formatTime(seconds) {
+        const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+        const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${h}:${m}:${s}`;
+    }
+
+    function formatMoney(n) {
+        return '₪' + Number(n.toFixed(2)).toLocaleString('he');
+    }
+
+    function updateDisplay() {
+    const hourly = parseFloat(document.getElementById('att_hourly').value) || 0;
+    if (running && startTime) {
+        const elapsedSec = (Date.now() - new Date(startTime)) / 1000;
+        document.getElementById('att_timer').textContent = formatTime(Math.floor(elapsedSec));
+        const earned = hourly * (elapsedSec / 3600); // שעות = seconds / 3600
+        document.getElementById('att_earned').textContent = formatMoney(Number(earned.toFixed(2)));
+    } else {
+        document.getElementById('att_timer').textContent = '00:00:00';
+        document.getElementById('att_earned').textContent = formatMoney(0);
+    }
+}
+
+    function calculateShiftValue(shift) {
+    const hourly = parseFloat(document.getElementById('att_hourly').value) || 0;
+    if (!shift.breakdown) return hourly * (shift.hours || 0);
+    return Object.entries(shift.breakdown).reduce((sum, [pct, hrs]) => {
+        return sum + (hourly * (pct / 100) * (parseFloat(hrs) || 0));
+    }, 0);
+}
+
+    function renderList() {
+        loadData();
+        const list = document.getElementById('att_list');
+        const shifts = window.appData.attendance.slice().reverse();
+        let monthTotal = 0;
+
+        if (shifts.length === 0) {
+            list.innerHTML = `<div class="att-card" style="text-align:center; padding:40px; color:var(--text-sec);">${H.no_shifts}</div>`;
+            document.getElementById('att_month_total').textContent = '₪0.00';
+            return;
+        }
+
+        list.innerHTML = shifts.map(shift => {
+            const start = new Date(shift.start);
+            const end = shift.end ? new Date(shift.end) : null;
+            const hours = shift.hours || 0;
+            const value = calculateShiftValue(shift);
+            monthTotal += value;
+
+            const dateStr = start.toLocaleDateString('he-IL');
+            const timeStr = `${start.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'})} - ${end ? end.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'}) : 'רץ'}`;
+            const breakdown = shift.breakdown ? Object.entries(shift.breakdown).map(([p,h]) => `${p}%: ${h}h`).join(', ') : '100%';
+
+            return `
+                <div class="att-row">
+                    <div style="padding:15px;">
+                        <div class="att-row-date">${dateStr}</div>
+                        <div class="att-row-time">${timeStr}</div>
+                        <div style="margin:10px 0; color:var(--text-sec); font-size:0.9rem;">${breakdown}</div>
+                        <div class="att-row-earned">${formatMoney(value)}</div>
+                    </div>
+                    <div style="padding:0 15px 15px; display:flex; gap:10px;">
+                        <button onclick="editShift(${shift.id})" style="flex:1; padding:10px; background:var(--primary); color:white; border:none; border-radius:10px;">${H.edit_hours}</button>
+                        <button onclick="deleteShift(${shift.id})" style="padding:10px; background:rgba(255,118,117,0.15); color:var(--danger); border:none; border-radius:10px;"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div id="edit-${shift.id}" class="att-edit-panel">
+                        ${TIERS.map(t => `
+                            <div class="att-tier-row">
+                                <span class="att-tier-label">${t}%</span>
+                                <input type="number" step="0.1" min="0" value="${(shift.breakdown && shift.breakdown[t]) || 0}" data-tier="${t}" data-id="${shift.id}" class="att-tier-input">
+                            </div>
+                        `).join('')}
+                        <div style="margin-top:15px; display:flex; gap:10px;">
+                            <button onclick="saveEdit(${shift.id})" style="flex:1; padding:12px; background:var(--success); color:white; border:none; border-radius:10px;">${H.save}</button>
+                            <button onclick="cancelEdit(${shift.id})" style="flex:1; padding:12px; background:rgba(0,0,0,0.1); color:var(--text-main); border:none; border-radius:10px;">${H.cancel}</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('att_month_total').textContent = formatMoney(monthTotal);
+    }
+
+    window.editShift = id => {
+        document.querySelectorAll('.att-edit-panel').forEach(p => p.style.display = 'none');
+        const panel = document.getElementById(`edit-${id}`);
+        if (panel) panel.style.display = 'block';
+    };
+
+    window.cancelEdit = id => {
+        document.getElementById(`edit-${id}`).style.display = 'none';
+    };
+
+    window.saveEdit = id => {
+    const inputs = document.querySelectorAll(`input[data-id="${id}"]`);
+    const breakdown = {};
+    let totalHours = 0;
+    inputs.forEach(inp => {
+        const h = parseFloat(inp.value) || 0;
+        if (h > 0) {
+            breakdown[inp.dataset.tier] = Number(h.toFixed(3));
+            totalHours += h;
+        }
+    });
+
+    const shift = window.appData.attendance.find(s => s.id === id);
+    if (!shift) return;
+
+    const maxHours = shift.actualHours || shift.hours || totalHours;
+
+    if (totalHours > maxHours && totalHours > 0) {
+        // התאמה פרופורציונלית: נקטין את כל השעות כך שסכומן = maxHours
+        const factor = maxHours / totalHours;
+        Object.keys(breakdown).forEach(k => {
+            breakdown[k] = Number((breakdown[k] * factor).toFixed(3));
+        });
+        totalHours = Number(Object.values(breakdown).reduce((a,b)=>a+parseFloat(b||0),0).toFixed(3));
+        showAppAlert('התראה', 'הזנת שעות חורגת מהמשמרת. הערכים הותאמו אוטומטית.', '⚠️');
+    }
+
+    shift.breakdown = Object.keys(breakdown).length ? breakdown : null;
+    shift.hours = Number(totalHours.toFixed(3));
+    saveData();
+    renderList();
+    showAppAlert('נשמר!', 'השינויים עודכנו בהצלחה', '✅');
+};
+
+
+    window.deleteShift = id => {
+        showConfirmDialog('מחיקת משמרת', 'בטוח שברצונך למחוק את המשמרת הזו?', () => {
+            window.appData.attendance = window.appData.attendance.filter(s => s.id !== id);
+            saveData();
+            renderList();
+        });
+    };
+
+    document.addEventListener('click', e => {
+        if (e.target.closest('#att_toggle')) {
+            const btn = document.getElementById('att_toggle');
+            if (!running) {
+                startTime = new Date().toISOString();
+                running = true;
+                saveRunState();
+                btn.innerHTML = `<i class="fas fa-stop"></i> ${H.stop}`;
+                btn.classList.remove('att-start-btn');
+                btn.classList.add('att-stop-btn');
+                timerInterval = setInterval(updateDisplay, 500);
+                updateDisplay();
+            } else {
+                const endTime = new Date();
+// actualHours = דקה: שניות -> שעות מדויקות (float)
+const actualHours = (endTime - new Date(startTime)) / (1000 * 60 * 60); // milliseconds -> hours
+const shift = {
+    id: Date.now(),
+    start: startTime,
+    end: endTime.toISOString(),
+    actualHours: actualHours,                  // שומר את הערך המדויק (לשימוש בבדיקות)
+    hours: Number(actualHours.toFixed(3)),     // ערך להצגה / חישוב מהיר (3 מקומות עשרוניים)
+    breakdown: { 100: Number(actualHours.toFixed(3)) } // ברירת מחדל: כל השעות ב-100%
+};
+
+                loadData();
+                window.appData.attendance.push(shift);
+                saveData();
+                renderList();
+
+                running = false;
+                clearRunState();
+                clearInterval(timerInterval);
+                btn.innerHTML = `<i class="fas fa-play"></i> ${H.start}`;
+                btn.classList.remove('att-stop-btn');
+                btn.classList.add('att-start-btn');
+                updateDisplay();
+                showAppAlert('משמרת הסתיימה!', `נוספו ${shift.hours} שעות`, '✅');
+            }
+        }
+
+        if (e.target.closest('#att_manual')) {
+            const h = prompt('כמה שעות להוסיף?');
+const hours = parseFloat(h);
+if (hours > 0) {
+    const shift = {
+        id: Date.now(),
+        start: new Date().toISOString(),
+        end: new Date().toISOString(),
+        actualHours: hours,
+        hours: Number(hours.toFixed(3)),
+        breakdown: { 100: Number(hours.toFixed(3)) }
+    };
+    loadData();
+    window.appData.attendance.push(shift);
+    saveData();
+    renderList();
+}
+
+        }
+
+        if (e.target.closest('#att_clear')) {
+            showConfirmDialog('ניקוי מלא', H.confirm_clear, () => {
+                window.appData.attendance = [];
+                saveData();
+                renderList();
+            });
+        }
+
+        if (e.target.closest('#att_export')) {
+            // ייצוא CSV - קוד פשוט
+            loadData();
+            const rows = [['תאריך','שעות','סכום']];
+            window.appData.attendance.forEach(s => {
+                const date = new Date(s.start).toLocaleDateString('he-IL');
+                const value = calculateShiftValue(s);
+                rows.push([date, s.hours, value]);
+            });
+            const csv = rows.map(r => r.join(',')).join('\n');
+            const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `נוכחות_${new Date().getFullYear()}_${String(new Date().getMonth()+1).padStart(2,'0')}.csv`;
+            a.click();
+        }
+    });
+
+    // אתחול
+    window.initAttendance = () => {
+        loadData();
+        loadRunState();
+        updateDisplay();
+        renderList();
+        if (running) {
+            document.getElementById('att_toggle').innerHTML = `<i class="fas fa-stop"></i> ${H.stop}`;
+            document.getElementById('att_toggle').classList.add('att-stop-btn');
+            timerInterval = setInterval(updateDisplay, 500);
+        }
+    };
+
+    // חיבור ל-navTo
+    const oldNav = window.navTo;
+    window.navTo = function(page) {
+        if (oldNav) oldNav(page);
+        if (page === 'attendance') {
+            setTimeout(initAttendance, 100);
+        }
+    };
+
+    // הפעלה אוטומטית אם העמוד פתוח
+    if (location.hash.includes('attendance') || document.querySelector('#page-attendance.active')) {
+        setTimeout(initAttendance, 300);
+    }
+})();
+</script>
 </body>
 </html>

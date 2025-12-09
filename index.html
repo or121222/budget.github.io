@@ -222,6 +222,7 @@
         .landing-tip-text { font-size: 1.1rem; font-style: italic; line-height: 1.5; }
         .btn-start-app { background: white; color: var(--primary); font-size: 1.4rem; font-weight: 700; padding: 18px 60px; border-radius: 50px; border: none; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.2s, box-shadow 0.2s; display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
         .btn-start-app:active { transform: scale(0.95); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
 
         /* Switches & Settings */
         .lang-toggle-container { display: flex; gap: 15px; margin-top: 10px; justify-content: center; }
@@ -279,6 +280,27 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        /* כפתור משני קטן (לשעון נוכחות) */
+.btn-small-link {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 15px 25px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    margin-bottom: 15px; /* רווח מתחתיו */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(5px);
+    transition: transform 0.2s;
+}
+.btn-small-link:active {
+    transform: scale(2);
+    background: rgba(255, 255, 255, 0.3);
+}
     </style>
 </head>
 <body>
@@ -310,11 +332,16 @@
             <div class="landing-tip-title"><i class="fas fa-lightbulb"></i> <span data-lang="daily_tip">טיפ יומי</span></div>
             <div class="landing-tip-text" id="landing-tip-text">...</div>
         </div>
-
+        <button class="btn-small-link" onclick="navTo('attendance')" style="margin-top: 15px; background: rgba(255,255,255,0.9); color: var(--primary);">
+            
+            <i class="fas fa-stopwatch" style="margin-right: 0px;"></i>
+        </button>
+        
         <button class="btn-start-app" onclick="navTo('dashboard')">
             <span data-lang="start_btn">בואו נתחיל</span> 
             <i class="fas fa-arrow-left" id="start-arrow"></i>
         </button>
+        
 
         <div class="lang-toggle-container">
             <button class="lang-mini-btn" onclick="setLanguage('he')" data-lang-btn="he">
@@ -331,7 +358,7 @@
     <div id="menu-overlay" class="side-menu-overlay" onclick="toggleMenu()"></div>
     
     <div id="side-menu" class="side-menu">
-        <h2 style="color:var(--primary); padding:0 20px;" data-lang="menu_title">תפריט</h2>
+        <h2 ="color:var(--primary); padding:0 20px;" data-lang="menu_title">תפריט</h2>
         <div class="menu-item active" onclick="navTo('dashboard')"><i class="fas fa-home"></i> <span data-lang="menu_home">ראשי</span></div>
         <div class="menu-item" onclick="navTo('recurring')"><i class="fas fa-sync-alt"></i> <span data-lang="menu_recur">הוצאות קבועות</span></div>
         <div class="menu-item" onclick="navTo('converter')"><i class="fas fa-exchange-alt"></i> <span data-lang="menu_converter">ממיר מטבעות</span></div>
@@ -341,7 +368,7 @@
         <div class="menu-item" onclick="navTo('wishlist')"><i class="fas fa-gift"></i> <span data-lang="menu_wishlist">משאלות</span></div>
         <div class="menu-item" onclick="navTo('premium')"><i class="fas fa-star"></i> <span data-lang="menu_pro">פרימיום</span></div>
         
-        <div class="menu-divider" style="height:1px;background:rgba(0,0,0,0.1);margin:5px 0;"></div>
+        <div class="menu-divider" ="height:1px;background:rgba(0,0,0,0.1);margin:5px 0;"></div>
         
         <div class="menu-item" onclick="openSettingsModal()"><i class="fas fa-cog"></i> <span data-lang="menu_backup">הגדרות</span></div>
         <div class="menu-item" onclick="toggleDarkMode()"><i class="fas fa-moon"></i> <span data-lang="menu_dark">מצב לילה</span></div>
@@ -1755,3 +1782,4 @@ if (hours > 0) {
 </script>
 </body>
 </html>
+
